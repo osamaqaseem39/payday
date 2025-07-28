@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Footer() {
   return (
@@ -6,9 +7,18 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
-          <div className="lg:col-span-2">
-            <h3 className="text-2xl font-bold text-blue-400 mb-4">PaydayExpress.ca</h3>
-            <p className="text-gray-300 mb-6 max-w-md">
+          <div>
+            <div className="flex items-center mb-4">
+              <Image
+                src="/images/logo.png"
+                alt="Payday Express Logo"
+                width={40}
+                height={40}
+                className="mr-3"
+              />
+              <h3 className="text-2xl font-bold text-blue-400">Payday Express</h3>
+            </div>
+            <p className="text-gray-300 mb-6">
               Empowering Canadians with transparent, fixed-fee lending solutions. From personal loans to business financing, 
               we provide fast, secure, and ethical financial services backed by blockchain technology.
             </p>
@@ -56,8 +66,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/loan-calculator" className="text-gray-300 hover:text-blue-400 transition-colors">
-                  Loan Calculator
+                <Link href="/career" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  Careers
                 </Link>
               </li>
             </ul>

@@ -6,9 +6,9 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
-          <div className="lg:col-span-2">
+          <div>
             <h3 className="text-2xl font-bold text-blue-400 mb-4">PaydayExpress.ca</h3>
-            <p className="text-gray-300 mb-6 max-w-md">
+            <p className="text-gray-300 mb-6 leading-relaxed">
               Empowering Canadians with transparent, fixed-fee lending solutions. From personal loans to business financing, 
               we provide fast, secure, and ethical financial services backed by blockchain technology.
             </p>
@@ -60,6 +60,16 @@ export default function Footer() {
                   Loan Calculator
                 </Link>
               </li>
+              <li>
+                <Link href="/partners" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  Partners
+                </Link>
+              </li>
+              <li>
+                <Link href="/career" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  Career
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -85,6 +95,16 @@ export default function Footer() {
               <li>
                 <Link href="/small-business-loans" className="text-gray-300 hover:text-blue-400 transition-colors">
                   Business Loans
+                </Link>
+              </li>
+              <li>
+                <Link href="/home-improvement-loans" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  Home Improvement
+                </Link>
+              </li>
+              <li>
+                <Link href="/medical-loans" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  Medical Loans
                 </Link>
               </li>
               <li>

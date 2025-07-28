@@ -15,7 +15,6 @@ export default function HowItWorks() {
           if (entry.isIntersecting) {
             setVisibleCards(prev => new Set([...prev, index]));
           }
-          // Removed the else clause to prevent hiding cards when scrolling down
         });
       },
       { 
@@ -30,6 +29,7 @@ export default function HowItWorks() {
 
     return () => observer.disconnect();
   }, []);
+
   const steps = [
     {
       number: '01',
@@ -87,46 +87,79 @@ export default function HowItWorks() {
     }
   ];
 
-
-
   return (
-    <section ref={sectionRef} id="how-it-works" className="py-16 bg-gradient-to-b from-white  via-indigo-50 to-purple-50 overflow-hidden snap-y snap-mandatory">
+    <section ref={sectionRef} id="how-it-works" className="py-16 bg-gradient-to-b from-white via-indigo-50 to-purple-50 overflow-hidden">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
             How It Works — Simple, Fast, and Transparent
           </h2>
-          <p className="text-xl text-gray-600 max-w-4xl mx-auto">
+          <p className="text-lg md:text-xl text-gray-600 max-w-4xl mx-auto">
             Get your loan in 6 simple steps. No complicated processes, just straightforward lending.
           </p>
         </div>
 
         {/* Timeline */}
         <div className="relative">
-          {/* Timeline Line */}
+          {/* Timeline Line - Desktop Only */}
           <div className={`absolute left-1/2 transform -translate-x-px h-full w-0.5 bg-gradient-to-b from-blue-400 to-purple-400 hidden lg:block transition-all duration-1000 ${visibleCards.size > 0 ? 'opacity-100' : 'opacity-0'}`}></div>
 
           {/* Steps */}
-          <div className="space-y-0">
+          <div className="space-y-8 lg:space-y-0">
             {steps.map((step, index) => (
               <div 
                 key={step.number} 
                 data-index={index}
-                className={`relative flex items-center ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} transition-all duration-1000 snap-start min-h-[50vh]`}
+                className={`relative flex flex-col lg:flex-row items-center ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} transition-all duration-1000 min-h-[auto] lg:min-h-[50vh]`}
                 style={{ 
-                  marginTop: index > 0 ? '-100px' : '0',
+                  marginTop: index > 0 ? '0' : '0',
                   transform: visibleCards.has(index) ? 'translateX(0)' : `translateX(${index % 2 === 0 ? '-100%' : '100%'})`,
                   opacity: visibleCards.has(index) ? 1 : 0,
                   willChange: 'transform, opacity'
                 }}
               >
-                {/* Timeline Dot */}
+                {/* Timeline Dot - Desktop Only */}
                 <div className={`absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 bg-gradient-to-r ${step.gradient} rounded-full border-4 border-white shadow-xl hidden lg:block z-10 transition-all duration-1000 ${visibleCards.has(index) ? 'scale-100' : 'scale-0'}`}></div>
 
                 {/* Content */}
-                <div className={`lg:w-1/2 ${index % 2 === 0 ? 'lg:pr-2' : 'lg:pl-2'}`}>
-                  <div className="relative w-[400px] h-[500px] mx-auto group perspective-1000">
+                <div className={`w-full lg:w-1/2 ${index % 2 === 0 ? 'lg:pr-8' : 'lg:pl-8'}`}>
+                  {/* Mobile Card */}
+                  <div className="lg:hidden bg-white rounded-2xl p-6 shadow-lg border border-gray-200 mb-6">
+                    {/* Step Number and Icon */}
+                    <div className="flex items-center mb-4">
+                      <div className={`w-10 h-10 bg-gradient-to-r ${step.gradient} rounded-lg flex items-center justify-center mr-3 shadow-md`}>
+                        <span className="text-white font-bold text-sm">{step.number}</span>
+                      </div>
+                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center shadow-md">
+                        <span className="text-xl">{step.icon}</span>
+                      </div>
+                    </div>
+
+                    {/* Step Title */}
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">
+                      {step.title}
+                    </h3>
+
+                    {/* Step Description */}
+                    <p className="text-gray-600 leading-relaxed text-sm mb-4">
+                      {step.description}
+                    </p>
+
+                    {/* Step Image - Mobile */}
+                    <div className="rounded-xl overflow-hidden w-full h-48 bg-gradient-to-br from-gray-50 to-gray-100 p-2">
+                      <Image
+                        src={step.image}
+                        alt={`Step ${step.number} - ${step.title}`}
+                        width={300}
+                        height={200}
+                        className="w-full h-full object-contain rounded-lg"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Desktop Card */}
+                  <div className="hidden lg:block relative w-full max-w-md mx-auto group perspective-1000">
                     {/* Front of Card */}
                     <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-3xl p-6 shadow-2xl border border-gray-200 transition-all duration-700 transform-style-preserve-3d group-hover:rotate-y-180 backface-hidden hover:shadow-3xl">
                       {/* Step Number and Icon */}
@@ -150,12 +183,12 @@ export default function HowItWorks() {
                       </p>
 
                       {/* Step Image */}
-                      <div className="mt-4 rounded-2xl overflow-hidden w-[280px] h-[280px] mx-auto bg-gradient-to-br from-gray-50 to-gray-100 p-2">
+                      <div className="mt-4 rounded-2xl overflow-hidden w-full h-64 bg-gradient-to-br from-gray-50 to-gray-100 p-2">
                         <Image
                           src={step.image}
                           alt={`Step ${step.number} - ${step.title}`}
-                          width={280}
-                          height={280}
+                          width={300}
+                          height={250}
                           className="w-full h-full object-contain rounded-xl"
                         />
                       </div>
@@ -187,7 +220,7 @@ export default function HowItWorks() {
                 </div>
 
                 {/* Spacer for mobile */}
-                <div className="lg:hidden w-full h-8"></div>
+                <div className="lg:hidden w-full h-4"></div>
               </div>
             ))}
           </div>
@@ -195,7 +228,7 @@ export default function HowItWorks() {
 
         {/* CTA */}
         <div className="text-center mt-12">
-          <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+          <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 md:px-8 py-3 md:py-4 rounded-xl text-base md:text-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
             Get Started Now
           </button>
         </div>

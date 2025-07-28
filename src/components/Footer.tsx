@@ -16,7 +16,6 @@ export default function Footer() {
                 height={40}
                 className="mr-3"
               />
-              <h3 className="text-2xl font-bold text-blue-400">Payday Express</h3>
             </div>
             <p className="text-gray-300 mb-6">
               Empowering Canadians with transparent, fixed-fee lending solutions. From personal loans to business financing, 

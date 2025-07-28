@@ -134,7 +134,7 @@ export default function HowItWorks() {
                 </p>
 
                 {/* Step Image */}
-                <div className="rounded-2xl overflow-hidden w-full h-64 bg-gradient-to-br from-gray-50 to-gray-100 p-2">
+                <div className="rounded-2xl overflow-hidden w-full h-56 bg-gradient-to-br from-gray-50 to-gray-100 p-2">
                   <Image
                     src={step.image}
                     alt={`Step ${step.number} - ${step.title}`}
@@ -171,7 +171,7 @@ export default function HowItWorks() {
                   opacity: visibleCards.has(index) ? 1 : 0,
                 }}
               >
-                <div className="relative w-full h-[600px] group perspective-1000">
+                <div className="relative w-full h-[500px] group perspective-1000">
                   {/* Front of Card */}
                   <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-3xl p-6 shadow-2xl border border-gray-200 transition-all duration-700 transform-style-preserve-3d group-hover:rotate-y-180 backface-hidden hover:shadow-3xl">
                     {/* Step Number and Icon */}
@@ -195,7 +195,7 @@ export default function HowItWorks() {
                     </p>
 
                     {/* Step Image */}
-                    <div className="mt-2 rounded-2xl overflow-hidden w-full h-80 bg-gradient-to-br from-gray-50 to-gray-100 p-2">
+                    <div className="mt-2 rounded-2xl overflow-hidden w-full h-[300px] bg-gradient-to-br from-gray-50 to-gray-100 p-2">
                       <Image
                         src={step.image}
                         alt={`Step ${step.number} - ${step.title}`}

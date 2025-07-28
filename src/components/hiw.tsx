@@ -158,60 +158,36 @@ export default function HowItWorks() {
           ))}
         </div>
 
-        {/* Desktop Layout - 2-Row Grid */}
-        <div className="hidden lg:block">
-          <div className="grid grid-cols-3 gap-8">
+        {/* Desktop Layout - Timeline */}
+        <div className="hidden lg:block relative">
+          {/* Timeline Line */}
+          <div className={`absolute left-1/2 transform -translate-x-px h-full w-0.5 bg-gradient-to-b from-blue-400 to-purple-400 transition-all duration-1000 ${visibleCards.size > 0 ? 'opacity-100' : 'opacity-0'}`}></div>
+
+          {/* Steps */}
+          <div className="space-y-8">
             {steps.map((step, index) => (
               <div 
                 key={step.number} 
                 data-index={index}
-                className="transition-all duration-700 ease-out"
+                className={`relative flex items-center ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} transition-all duration-700 ease-out`}
                 style={{ 
+                  marginTop: index > 0 ? '0' : '0',
                   transform: visibleCards.has(index) ? 'translateY(0)' : 'translateY(50px)',
                   opacity: visibleCards.has(index) ? 1 : 0,
                 }}
               >
-                <div className="relative w-full h-[500px] group perspective-1000">
-                  {/* Front of Card */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-3xl p-6 shadow-2xl border border-gray-200 transition-all duration-700 transform-style-preserve-3d group-hover:rotate-y-180 backface-hidden hover:shadow-3xl">
-                    {/* Step Number and Icon */}
-                    <div className="flex items-center mb-4">
-                      <div className={`w-12 h-12 bg-gradient-to-r ${step.gradient} rounded-xl flex items-center justify-center mr-3 shadow-lg`}>
-                        <span className="text-white font-bold text-lg">{step.number}</span>
-                      </div>
-                      <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center shadow-md">
-                        <span className="text-2xl">{step.icon}</span>
-                      </div>
-                    </div>
+                {/* Timeline Dot */}
+                <div className={`absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 bg-gradient-to-r ${step.gradient} rounded-full border-4 border-white shadow-xl z-10 transition-all duration-700 ${visibleCards.has(index) ? 'scale-100' : 'scale-0'}`}></div>
 
-                    {/* Step Title */}
-                    <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                      {step.title}
-                    </h3>
-
-                    {/* Step Description */}
-                    <p className="text-gray-600 leading-relaxed text-base">
-                      {step.description}
-                    </p>
-
-                    {/* Step Image */}
-                    <div className="mt-4 rounded-2xl overflow-hidden w-full h-48 bg-gradient-to-br from-gray-50 to-gray-100 p-2">
-                      <Image
-                        src={step.image}
-                        alt={`Step ${step.number} - ${step.title}`}
-                        width={280}
-                        height={280}
-                        className="w-full h-full object-contain rounded-xl"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Back of Card */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-3xl p-6 shadow-2xl border border-gray-200 transition-all duration-700 transform-style-preserve-3d rotate-y-180 group-hover:rotate-y-0 backface-hidden">
-                    <div className="h-full flex flex-col justify-center">
-                      <div className="text-center">
-                        {/* Step number and icon on back */}
-                        <div className="flex justify-center items-center mb-4">
+                {/* Content */}
+                <div className={`w-full lg:w-1/2 ${index % 2 === 0 ? 'lg:pr-8' : 'lg:pl-8'}`}>
+                  <div className="relative w-full max-w-[400px] mx-auto">
+                    {/* Desktop Card - 3D Flip version */}
+                    <div className="relative w-[400px] h-[500px] group perspective-1000">
+                      {/* Front of Card */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-3xl p-6 shadow-2xl border border-gray-200 transition-all duration-700 transform-style-preserve-3d group-hover:rotate-y-180 backface-hidden hover:shadow-3xl">
+                        {/* Step Number and Icon */}
+                        <div className="flex items-center mb-4">
                           <div className={`w-12 h-12 bg-gradient-to-r ${step.gradient} rounded-xl flex items-center justify-center mr-3 shadow-lg`}>
                             <span className="text-white font-bold text-lg">{step.number}</span>
                           </div>
@@ -219,12 +195,50 @@ export default function HowItWorks() {
                             <span className="text-2xl">{step.icon}</span>
                           </div>
                         </div>
+
+                        {/* Step Title */}
                         <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                          {step.detailedText.split('\n\n')[0]}
+                          {step.title}
                         </h3>
+
+                        {/* Step Description */}
                         <p className="text-gray-600 leading-relaxed text-base">
-                          {step.detailedText.split('\n\n')[1]}
+                          {step.description}
                         </p>
+
+                        {/* Step Image */}
+                        <div className="mt-4 rounded-2xl overflow-hidden w-[280px] h-[280px] mx-auto bg-gradient-to-br from-gray-50 to-gray-100 p-2">
+                          <Image
+                            src={step.image}
+                            alt={`Step ${step.number} - ${step.title}`}
+                            width={280}
+                            height={280}
+                            className="w-full h-full object-contain rounded-xl"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Back of Card */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-3xl p-6 shadow-2xl border border-gray-200 transition-all duration-700 transform-style-preserve-3d rotate-y-180 group-hover:rotate-y-0 backface-hidden">
+                        <div className="h-full flex flex-col justify-center">
+                          <div className="text-center">
+                            {/* Step number and icon on back */}
+                            <div className="flex justify-center items-center mb-4">
+                              <div className={`w-12 h-12 bg-gradient-to-r ${step.gradient} rounded-xl flex items-center justify-center mr-3 shadow-lg`}>
+                                <span className="text-white font-bold text-lg">{step.number}</span>
+                              </div>
+                              <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center shadow-md">
+                                <span className="text-2xl">{step.icon}</span>
+                              </div>
+                            </div>
+                            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                              {step.detailedText.split('\n\n')[0]}
+                            </h3>
+                            <p className="text-gray-600 leading-relaxed text-base">
+                              {step.detailedText.split('\n\n')[1]}
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>

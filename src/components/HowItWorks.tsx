@@ -100,13 +100,71 @@ export default function HowItWorks() {
           </p>
         </div>
 
-        {/* Timeline */}
-        <div className="relative">
-          {/* Timeline Line - Hidden on mobile */}
-          <div className={`absolute left-1/2 transform -translate-x-px h-full w-0.5 bg-gradient-to-b from-blue-400 to-purple-400 hidden lg:block transition-all duration-1000 ${visibleCards.size > 0 ? 'opacity-100' : 'opacity-0'}`}></div>
+        {/* Mobile Layout - Simple Cards */}
+        <div className="lg:hidden space-y-6">
+          {steps.map((step, index) => (
+            <div 
+              key={step.number} 
+              data-index={index}
+              className="w-full transition-all duration-700 ease-out"
+              style={{ 
+                transform: visibleCards.has(index) ? 'translateY(0)' : 'translateY(50px)',
+                opacity: visibleCards.has(index) ? 1 : 0,
+              }}
+            >
+              <div className="bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-3xl p-6 shadow-2xl border border-gray-200 transition-all duration-300 hover:shadow-3xl">
+                {/* Step Number and Icon */}
+                <div className="flex items-center mb-4">
+                  <div className={`w-12 h-12 bg-gradient-to-r ${step.gradient} rounded-xl flex items-center justify-center mr-3 shadow-lg`}>
+                    <span className="text-white font-bold text-lg">{step.number}</span>
+                  </div>
+                  <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center shadow-md">
+                    <span className="text-2xl">{step.icon}</span>
+                  </div>
+                </div>
+
+                {/* Step Title */}
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                  {step.title}
+                </h3>
+
+                {/* Step Description */}
+                <p className="text-gray-600 leading-relaxed text-base mb-4">
+                  {step.description}
+                </p>
+
+                {/* Step Image */}
+                <div className="rounded-2xl overflow-hidden w-full h-48 bg-gradient-to-br from-gray-50 to-gray-100 p-2">
+                  <Image
+                    src={step.image}
+                    alt={`Step ${step.number} - ${step.title}`}
+                    width={280}
+                    height={280}
+                    className="w-full h-full object-contain rounded-xl"
+                  />
+                </div>
+
+                {/* Detailed Text */}
+                <div className="mt-4 p-4 bg-white rounded-xl border border-gray-200">
+                  <h4 className="font-semibold text-gray-900 mb-2">
+                    {step.detailedText.split('\n\n')[0]}
+                  </h4>
+                  <p className="text-gray-600 text-sm">
+                    {step.detailedText.split('\n\n')[1]}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop Layout - Timeline */}
+        <div className="hidden lg:block relative">
+          {/* Timeline Line */}
+          <div className={`absolute left-1/2 transform -translate-x-px h-full w-0.5 bg-gradient-to-b from-blue-400 to-purple-400 transition-all duration-1000 ${visibleCards.size > 0 ? 'opacity-100' : 'opacity-0'}`}></div>
 
           {/* Steps */}
-          <div className="space-y-8 lg:space-y-0">
+          <div className="space-y-8">
             {steps.map((step, index) => (
               <div 
                 key={step.number} 
@@ -118,58 +176,14 @@ export default function HowItWorks() {
                   opacity: visibleCards.has(index) ? 1 : 0,
                 }}
               >
-                {/* Timeline Dot - Hidden on mobile */}
-                <div className={`absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 bg-gradient-to-r ${step.gradient} rounded-full border-4 border-white shadow-xl hidden lg:block z-10 transition-all duration-700 ${visibleCards.has(index) ? 'scale-100' : 'scale-0'}`}></div>
+                {/* Timeline Dot */}
+                <div className={`absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 bg-gradient-to-r ${step.gradient} rounded-full border-4 border-white shadow-xl z-10 transition-all duration-700 ${visibleCards.has(index) ? 'scale-100' : 'scale-0'}`}></div>
 
                 {/* Content */}
                 <div className={`w-full lg:w-1/2 ${index % 2 === 0 ? 'lg:pr-8' : 'lg:pl-8'}`}>
                   <div className="relative w-full max-w-[400px] mx-auto">
-                    {/* Mobile Card - Simple version */}
-                    <div className="lg:hidden bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-3xl p-6 shadow-2xl border border-gray-200 transition-all duration-300 hover:shadow-3xl">
-                      {/* Step Number and Icon */}
-                      <div className="flex items-center mb-4">
-                        <div className={`w-12 h-12 bg-gradient-to-r ${step.gradient} rounded-xl flex items-center justify-center mr-3 shadow-lg`}>
-                          <span className="text-white font-bold text-lg">{step.number}</span>
-                        </div>
-                        <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center shadow-md">
-                          <span className="text-2xl">{step.icon}</span>
-                        </div>
-                      </div>
-
-                      {/* Step Title */}
-                      <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                        {step.title}
-                      </h3>
-
-                      {/* Step Description */}
-                      <p className="text-gray-600 leading-relaxed text-base mb-4">
-                        {step.description}
-                      </p>
-
-                      {/* Step Image */}
-                      <div className="rounded-2xl overflow-hidden w-full h-48 bg-gradient-to-br from-gray-50 to-gray-100 p-2">
-                        <Image
-                          src={step.image}
-                          alt={`Step ${step.number} - ${step.title}`}
-                          width={280}
-                          height={280}
-                          className="w-full h-full object-contain rounded-xl"
-                        />
-                      </div>
-
-                      {/* Detailed Text for Mobile */}
-                      <div className="mt-4 p-4 bg-white rounded-xl border border-gray-200">
-                        <h4 className="font-semibold text-gray-900 mb-2">
-                          {step.detailedText.split('\n\n')[0]}
-                        </h4>
-                        <p className="text-gray-600 text-sm">
-                          {step.detailedText.split('\n\n')[1]}
-                        </p>
-                      </div>
-                    </div>
-
                     {/* Desktop Card - 3D Flip version */}
-                    <div className="hidden lg:block relative w-[400px] h-[500px] group perspective-1000">
+                    <div className="relative w-[400px] h-[500px] group perspective-1000">
                       {/* Front of Card */}
                       <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-3xl p-6 shadow-2xl border border-gray-200 transition-all duration-700 transform-style-preserve-3d group-hover:rotate-y-180 backface-hidden hover:shadow-3xl">
                         {/* Step Number and Icon */}
@@ -229,9 +243,6 @@ export default function HowItWorks() {
                     </div>
                   </div>
                 </div>
-
-                {/* Spacer for mobile */}
-                <div className="lg:hidden w-full h-4"></div>
               </div>
             ))}
           </div>

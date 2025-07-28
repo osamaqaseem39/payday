@@ -70,157 +70,192 @@ export default function Contact() {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12">
-          {/* Contact Form */}
-          <div className="bg-white rounded-2xl shadow-xl p-8 lg:p-10">
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Contact Us</h2>
-              <p className="text-gray-600">We typically respond within 24–48 hours.</p>
-            </div>
-
-            {isSubmitted ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Message Sent!</h3>
-                <p className="text-gray-600">Thank you for reaching out. We'll get back to you within 24-48 hours.</p>
+          {/* Left Column - Why Reach Out and Contact Form */}
+          <div className="space-y-8">
+          
+            {/* Contact Form */}
+            <div className="bg-white rounded-2xl shadow-xl p-8 lg:p-10">
+              <div className="mb-8">
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">Contact Us</h2>
+                <p className="text-gray-600">We typically respond within 24–48 hours.</p>
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
+
+              {isSubmitted ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Message Sent!</h3>
+                  <p className="text-gray-600">Thank you for reaching out. We'll get back to you within 24-48 hours.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
+                        <FaUser className="inline mr-2" />
+                        Full Name
+                      </label>
+                      <input
+                        type="text"
+                        id="fullName"
+                        name="fullName"
+                        value={formData.fullName}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                        placeholder="Enter your full name"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="mobileNumber" className="block text-sm font-medium text-gray-700 mb-2">
+                        <FaMobile className="inline mr-2" />
+                        Mobile Number
+                      </label>
+                      <input
+                        type="tel"
+                        id="mobileNumber"
+                        name="mobileNumber"
+                        value={formData.mobileNumber}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                        placeholder="Enter your mobile number"
+                      />
+                    </div>
+                  </div>
+
                   <div>
-                    <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
-                      <FaUser className="inline mr-2" />
-                      Full Name
+                    <label htmlFor="emailAddress" className="block text-sm font-medium text-gray-700 mb-2">
+                      <FaEnvelopeOpen className="inline mr-2" />
+                      Email Address
                     </label>
                     <input
-                      type="text"
-                      id="fullName"
-                      name="fullName"
-                      value={formData.fullName}
+                      type="email"
+                      id="emailAddress"
+                      name="emailAddress"
+                      value={formData.emailAddress}
                       onChange={handleInputChange}
                       required
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-                      placeholder="Enter your full name"
+                      placeholder="Enter your email address"
                     />
                   </div>
+
                   <div>
-                    <label htmlFor="mobileNumber" className="block text-sm font-medium text-gray-700 mb-2">
-                      <FaMobile className="inline mr-2" />
-                      Mobile Number
+                    <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+                      <FaFileAlt className="inline mr-2" />
+                      Subject
                     </label>
-                    <input
-                      type="tel"
-                      id="mobileNumber"
-                      name="mobileNumber"
-                      value={formData.mobileNumber}
+                    <select
+                      id="subject"
+                      name="subject"
+                      value={formData.subject}
                       onChange={handleInputChange}
                       required
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-                      placeholder="Enter your mobile number"
+                    >
+                      <option value="">Select a subject</option>
+                      <option value="loan-inquiry">Loan Inquiry</option>
+                      <option value="account-assistance">Account Assistance</option>
+                      <option value="investment-guidance">Investment Guidance</option>
+                      <option value="business-partnership">Business Partnership</option>
+                      <option value="media-request">Media Request</option>
+                      <option value="general">General Inquiry</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                      <FaComments className="inline mr-2" />
+                      Message
+                    </label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      required
+                      rows={6}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 resize-none"
+                      placeholder="Tell us how we can help you..."
                     />
                   </div>
-                </div>
 
-                <div>
-                  <label htmlFor="emailAddress" className="block text-sm font-medium text-gray-700 mb-2">
-                    <FaEnvelopeOpen className="inline mr-2" />
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    id="emailAddress"
-                    name="emailAddress"
-                    value={formData.emailAddress}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-                    placeholder="Enter your email address"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
-                    <FaFileAlt className="inline mr-2" />
-                    Subject
-                  </label>
-                  <select
-                    id="subject"
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 px-8 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <option value="">Select a subject</option>
-                    <option value="loan-inquiry">Loan Inquiry</option>
-                    <option value="account-assistance">Account Assistance</option>
-                    <option value="investment-guidance">Investment Guidance</option>
-                    <option value="business-partnership">Business Partnership</option>
-                    <option value="media-request">Media Request</option>
-                    <option value="general">General Inquiry</option>
-                  </select>
-                </div>
+                    {isSubmitting ? (
+                      <span className="flex items-center justify-center">
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Sending...
+                      </span>
+                    ) : (
+                      'Get in Touch'
+                    )}
+                  </button>
+                </form>
+              )}
 
-                <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                    <FaComments className="inline mr-2" />
-                    Message
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    required
-                    rows={6}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 resize-none"
-                    placeholder="Tell us how we can help you..."
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 px-8 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? (
-                    <span className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Sending...
-                    </span>
-                  ) : (
-                    'Get in Touch'
-                  )}
-                </button>
-              </form>
-            )}
-
-            {/* Let's Connect and Grow Section */}
-            <div className="mt-8 pt-8 border-t border-gray-200">
-              <div className="text-center">
+              {/* Let's Connect and Grow Section */}
+              <div className="mt-8 pt-8 border-t border-gray-200">
                 
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Let's Connect and Grow</h3>
-                <p className="text-gray-600 leading-relaxed mb-4">
-                  At Payday Express, we don't just offer financial solutions—we build relationships. 
-                  Whether you're a borrower or an investor, a first-time visitor or a loyal customer, 
-                  we value every conversation.
-                </p>
-              
-                <p className="text-lg text-blue-600 font-semibold">
-                  Your future starts with one message. Let's talk.
-                </p>
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">Why Reach Out?</h3>
+              <h4 className="text-lg font-semibold text-gray-800 mb-4">Transparent Help for Real People</h4>
+              <div className="space-y-3">
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-gray-700">Loan Inquiries – Understand your options, rates, and how to apply</p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-green-600 rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-gray-700">Account Assistance – Get support on payments, updates, or issues</p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-purple-600 rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-gray-700">Investment Guidance – Learn how to invest securely through our P2P platform</p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-red-600 rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-gray-700">Business Partnerships – Explore partnership or affiliate opportunities</p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-yellow-600 rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-gray-700">Media Requests – For press or public relations inquiries</p>
+                </div>
+                 
+                
+                <p className="text-lg text-blue-600 font-semibold text-center pt-4">
+                    Your future starts with one message. Let's talk.
+                  </p>
+                
               </div>
+            </div>
+        
             </div>
           </div>
 
-          {/* Contact Information */}
+          {/* Right Column - Contact Information and Image */}
           <div className="space-y-8">
+            {/* Contact Image */}
+            <div className="flex justify-center lg:justify-start mb-8">
+              <div className="relative">
+                <img 
+                  src="/images/contact.png" 
+                  alt="Contact Payday Express" 
+                  className="rounded-2xl shadow-2xl max-w-full h-auto"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-blue-600/20 to-purple-600/20 rounded-2xl"></div>
+              </div>
+            </div>
+
             {/* Customer Support */}
             <div className="bg-white rounded-2xl shadow-xl p-8">
               <h3 className="text-2xl font-bold text-gray-900 mb-6">Customer Support</h3>
@@ -275,34 +310,6 @@ export default function Contact() {
                       (Note: By appointment only. Virtual consultations available.)
                     </p>
                   </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Why Reach Out */}
-            <div className="bg-white rounded-2xl shadow-xl p-8">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Why Reach Out?</h3>
-              <h4 className="text-lg font-semibold text-gray-800 mb-4">Transparent Help for Real People</h4>
-              <div className="space-y-3">
-                <div className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
-                  <p className="text-gray-700">Loan Inquiries – Understand your options, rates, and how to apply</p>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-green-600 rounded-full mt-2 flex-shrink-0"></div>
-                  <p className="text-gray-700">Account Assistance – Get support on payments, updates, or issues</p>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-purple-600 rounded-full mt-2 flex-shrink-0"></div>
-                  <p className="text-gray-700">Investment Guidance – Learn how to invest securely through our P2P platform</p>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-red-600 rounded-full mt-2 flex-shrink-0"></div>
-                  <p className="text-gray-700">Business Partnerships – Explore partnership or affiliate opportunities</p>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-yellow-600 rounded-full mt-2 flex-shrink-0"></div>
-                  <p className="text-gray-700">Media Requests – For press or public relations inquiries</p>
                 </div>
               </div>
             </div>

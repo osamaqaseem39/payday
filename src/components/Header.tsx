@@ -7,6 +7,9 @@ import Image from 'next/image';
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isLoansDropdownOpen, setIsLoansDropdownOpen] = useState(false);
+  const [isPaydayExpressDropdownOpen, setIsPaydayExpressDropdownOpen] = useState(false);
+  const [isLendingTypesDropdownOpen, setIsLendingTypesDropdownOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,45 +42,128 @@ export default function Header() {
             <Link href="/" className="text-gray-900 hover:text-gray-600 transition-colors font-medium">
               Home
             </Link>
-            <Link href="#loans" className="text-gray-900 hover:text-gray-600 transition-colors font-medium">
-              Loans
-            </Link>
-            <Link href="#partners" className="text-gray-900 hover:text-gray-600 transition-colors font-medium">
-              Partners
-            </Link>
-            <Link href="#lending-types" className="text-gray-900 hover:text-gray-600 transition-colors font-medium">
-              Lending Types
-            </Link>
-            <Link href="#payday-express" className="text-gray-900 hover:text-gray-600 transition-colors font-medium">
-              Payday Express
-            </Link>
-            <Link href="#career" className="text-gray-900 hover:text-gray-600 transition-colors font-medium">
-              Career
-            </Link>
-            <Link href="/contact" className="text-gray-900 hover:text-gray-600 transition-colors font-medium">
-              Contact
-            </Link>
-            <Link href="/privacy" className="text-gray-900 hover:text-gray-600 transition-colors font-medium">
-              Privacy
-            </Link>
+            
+            {/* Loans Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setIsLoansDropdownOpen(!isLoansDropdownOpen)}
+                className="text-gray-900 hover:text-gray-600 transition-colors font-medium flex items-center"
+              >
+                Loans
+                <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {isLoansDropdownOpen && (
+                <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <div className="py-2">
+                    <Link href="/payday-loans" className="block px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors">
+                      Payday Loans
+                    </Link>
+                    <Link href="/personal-loans" className="block px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors">
+                      Personal Loans
+                    </Link>
+                    <Link href="/student-loans" className="block px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors">
+                      Student Loans
+                    </Link>
+                    <Link href="/vacation-loans" className="block px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors">
+                      Vacation Loans
+                    </Link>
+                    <Link href="/small-business-loans" className="block px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors">
+                      Small Business Loans
+                    </Link>
+                    <Link href="/home-improvement-loans" className="block px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors">
+                      Home Improvement Loans
+                    </Link>
+                    <Link href="/medical-loans" className="block px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors">
+                      Medical Loans
+                    </Link>
+                    <Link href="/wedding-loans" className="block px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors">
+                      Wedding Loans
+                    </Link>
+                    <Link href="/p2p-lending" className="block px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors">
+                      P2P Lending
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <Link href="/partners" className="text-gray-900 hover:text-gray-600 transition-colors font-medium">
               Partners
             </Link>
-            <Link href="/about" className="text-gray-900 hover:text-gray-600 transition-colors font-medium">
-              About
+            
+            {/* Lending Types Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setIsLendingTypesDropdownOpen(!isLendingTypesDropdownOpen)}
+                className="text-gray-900 hover:text-gray-600 transition-colors font-medium flex items-center"
+              >
+                Lending Types
+                <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {isLendingTypesDropdownOpen && (
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <div className="py-2">
+                    <Link href="/payday-loans" className="block px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors">
+                      Payday Loans
+                    </Link>
+                    <Link href="/p2p-lending" className="block px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors">
+                      P2P Loans
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Payday Express Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setIsPaydayExpressDropdownOpen(!isPaydayExpressDropdownOpen)}
+                className="text-gray-900 hover:text-gray-600 transition-colors font-medium flex items-center"
+              >
+                Payday Express
+                <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {isPaydayExpressDropdownOpen && (
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <div className="py-2">
+                    <Link href="/about" className="block px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors">
+                      About
+                    </Link>
+                    <Link href="/contact" className="block px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors">
+                      Contact
+                    </Link>
+                    <Link href="/privacy" className="block px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors">
+                      Privacy
+                    </Link>
+                    <Link href="/loan-calculator" className="block px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors">
+                      Loan Calculator
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <Link href="/career" className="text-gray-900 hover:text-gray-600 transition-colors font-medium">
+              Career
             </Link>
           </nav>
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <Link
-              href="#signin"
+              href="/signin"
               className="bg-white text-gray-900 px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors font-medium"
             >
               Sign in
             </Link>
             <Link
-              href="#apply"
+              href="/apply"
               className="bg-gray-900 text-green-500 px-6 py-2 rounded-lg hover:bg-gray-800 transition-colors font-medium"
             >
               Apply now
@@ -106,61 +192,83 @@ export default function Header() {
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
               <Link
-                href="#home"
+                href="/"
                 className="block px-3 py-2 text-gray-900 hover:text-gray-600 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Home
               </Link>
-              <Link
-                href="#loans"
-                className="block px-3 py-2 text-gray-900 hover:text-gray-600 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Loans
-              </Link>
-              <Link
-                href="#partners"
-                className="block px-3 py-2 text-gray-900 hover:text-gray-600 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Partners
-              </Link>
-              <Link
-                href="#lending-types"
-                className="block px-3 py-2 text-gray-900 hover:text-gray-600 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Lending Types
-              </Link>
-              <Link
-                href="#payday-express"
-                className="block px-3 py-2 text-gray-900 hover:text-gray-600 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Payday Express
-              </Link>
-              <Link
-                href="#career"
-                className="block px-3 py-2 text-gray-900 hover:text-gray-600 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Career
-              </Link>
-              <Link
-                href="/contact"
-                className="block px-3 py-2 text-gray-900 hover:text-gray-600 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Contact
-              </Link>
-              <Link
-                href="/privacy"
-                className="block px-3 py-2 text-gray-900 hover:text-gray-600 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Privacy
-              </Link>
+              
+              {/* Mobile Loans Section */}
+              <div className="px-3 py-2">
+                <div className="text-gray-900 font-medium mb-2">Loans</div>
+                <div className="pl-4 space-y-1">
+                  <Link
+                    href="/payday-loans"
+                    className="block py-1 text-gray-700 hover:text-gray-900 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Payday Loans
+                  </Link>
+                  <Link
+                    href="/personal-loans"
+                    className="block py-1 text-gray-700 hover:text-gray-900 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Personal Loans
+                  </Link>
+                  <Link
+                    href="/student-loans"
+                    className="block py-1 text-gray-700 hover:text-gray-900 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Student Loans
+                  </Link>
+                  <Link
+                    href="/vacation-loans"
+                    className="block py-1 text-gray-700 hover:text-gray-900 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Vacation Loans
+                  </Link>
+                  <Link
+                    href="/small-business-loans"
+                    className="block py-1 text-gray-700 hover:text-gray-900 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Small Business Loans
+                  </Link>
+                  <Link
+                    href="/home-improvement-loans"
+                    className="block py-1 text-gray-700 hover:text-gray-900 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Home Improvement Loans
+                  </Link>
+                  <Link
+                    href="/medical-loans"
+                    className="block py-1 text-gray-700 hover:text-gray-900 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Medical Loans
+                  </Link>
+                  <Link
+                    href="/wedding-loans"
+                    className="block py-1 text-gray-700 hover:text-gray-900 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Wedding Loans
+                  </Link>
+                  <Link
+                    href="/p2p-lending"
+                    className="block py-1 text-gray-700 hover:text-gray-900 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    P2P Lending
+                  </Link>
+                </div>
+              </div>
+
               <Link
                 href="/partners"
                 className="block px-3 py-2 text-gray-900 hover:text-gray-600 transition-colors"
@@ -168,23 +276,81 @@ export default function Header() {
               >
                 Partners
               </Link>
+              
+              {/* Mobile Lending Types Section */}
+              <div className="px-3 py-2">
+                <div className="text-gray-900 font-medium mb-2">Lending Types</div>
+                <div className="pl-4 space-y-1">
+                  <Link
+                    href="/payday-loans"
+                    className="block py-1 text-gray-700 hover:text-gray-900 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Payday Loans
+                  </Link>
+                  <Link
+                    href="/p2p-lending"
+                    className="block py-1 text-gray-700 hover:text-gray-900 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    P2P Loans
+                  </Link>
+                </div>
+              </div>
+              
+              {/* Mobile Payday Express Section */}
+              <div className="px-3 py-2">
+                <div className="text-gray-900 font-medium mb-2">Payday Express</div>
+                <div className="pl-4 space-y-1">
+                  <Link
+                    href="/about"
+                    className="block py-1 text-gray-700 hover:text-gray-900 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    About
+                  </Link>
+                  <Link
+                    href="/contact"
+                    className="block py-1 text-gray-700 hover:text-gray-900 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Contact
+                  </Link>
+                  <Link
+                    href="/privacy"
+                    className="block py-1 text-gray-700 hover:text-gray-900 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Privacy
+                  </Link>
+                  <Link
+                    href="/loan-calculator"
+                    className="block py-1 text-gray-700 hover:text-gray-900 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Loan Calculator
+                  </Link>
+                </div>
+              </div>
+              
               <Link
-                href="/about"
+                href="/career"
                 className="block px-3 py-2 text-gray-900 hover:text-gray-600 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
-                About
+                Career
               </Link>
+              
               <div className="px-3 py-2 space-y-2">
                 <Link
-                  href="#signin"
+                  href="/signin"
                   className="block bg-white text-gray-900 px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors text-center"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Sign in
                 </Link>
                 <Link
-                  href="#apply"
+                  href="/apply"
                   className="block bg-gray-900 text-green-500 px-6 py-2 rounded-lg hover:bg-gray-800 transition-colors text-center"
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -195,6 +361,26 @@ export default function Header() {
           </div>
         )}
       </div>
+      
+      {/* Close dropdowns when clicking outside */}
+      {isLoansDropdownOpen && (
+        <div 
+          className="fixed inset-0 z-40" 
+          onClick={() => setIsLoansDropdownOpen(false)}
+        />
+      )}
+      {isPaydayExpressDropdownOpen && (
+        <div 
+          className="fixed inset-0 z-40" 
+          onClick={() => setIsPaydayExpressDropdownOpen(false)}
+        />
+      )}
+      {isLendingTypesDropdownOpen && (
+        <div 
+          className="fixed inset-0 z-40" 
+          onClick={() => setIsLendingTypesDropdownOpen(false)}
+        />
+      )}
     </header>
   );
 } 

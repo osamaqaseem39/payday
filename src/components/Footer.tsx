@@ -2,15 +2,15 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer id="contact" className="bg-gray-900 text-white">
+    <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="lg:col-span-2">
             <h3 className="text-2xl font-bold text-blue-400 mb-4">PaydayExpress.ca</h3>
             <p className="text-gray-300 mb-6 max-w-md">
-              Providing fast, secure, and reliable payday loans across Canada when you need them most. 
-              Get the money you need in as little as 24 hours with our simple online application process.
+              Empowering Canadians with transparent, fixed-fee lending solutions. From personal loans to business financing, 
+              we provide fast, secure, and ethical financial services backed by blockchain technology.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
@@ -36,28 +36,60 @@ export default function Footer() {
             <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="#home" className="text-gray-300 hover:text-blue-400 transition-colors">
+                <Link href="/" className="text-gray-300 hover:text-blue-400 transition-colors">
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="#features" className="text-gray-300 hover:text-blue-400 transition-colors">
-                  Features
+                <Link href="/about" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  About Us
                 </Link>
               </li>
               <li>
-                <Link href="#calculator" className="text-gray-300 hover:text-blue-400 transition-colors">
-                  Loan Calculator
+                <Link href="/contact" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  Contact
                 </Link>
               </li>
               <li>
-                <Link href="#apply" className="text-gray-300 hover:text-blue-400 transition-colors">
+                <Link href="/apply" className="text-gray-300 hover:text-blue-400 transition-colors">
                   Apply Now
                 </Link>
               </li>
               <li>
-                <Link href="#contact" className="text-gray-300 hover:text-blue-400 transition-colors">
-                  Contact Us
+                <Link href="/loan-calculator" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  Loan Calculator
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Loan Services */}
+          <div>
+            <h4 className="text-lg font-semibold mb-4">Loan Services</h4>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/personal-loans" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  Personal Loans
+                </Link>
+              </li>
+              <li>
+                <Link href="/payday-loans" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  Payday Loans
+                </Link>
+              </li>
+              <li>
+                <Link href="/student-loans" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  Student Loans
+                </Link>
+              </li>
+              <li>
+                <Link href="/small-business-loans" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  Business Loans
+                </Link>
+              </li>
+              <li>
+                <Link href="/p2p-lending" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  P2P Lending
                 </Link>
               </li>
             </ul>
@@ -71,20 +103,20 @@ export default function Footer() {
                 <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
-                                 <span className="text-gray-300">1-800-PAYDAY-EX</span>
+                <span className="text-gray-300">1-800-PAYDAY-EX</span>
               </div>
               <div className="flex items-center space-x-3">
                 <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                                 <span className="text-gray-300">support@paydayexpress.com</span>
+                <span className="text-gray-300">support@paydayexpress.com</span>
               </div>
               <div className="flex items-center space-x-3">
                 <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                                 <span className="text-gray-300">123 Main St, Suite 100<br />Toronto, ON M5V 3A8</span>
+                <span className="text-gray-300">123 Main St, Suite 100<br />Toronto, ON M5V 3A8</span>
               </div>
             </div>
           </div>
@@ -102,13 +134,13 @@ export default function Footer() {
               <Link href="/privacy" className="text-gray-400 hover:text-blue-400 transition-colors">
                 Privacy Policy
               </Link>
-              <Link href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
+              <Link href="/terms" className="text-gray-400 hover:text-blue-400 transition-colors">
                 Terms of Service
               </Link>
-              <Link href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
+              <Link href="/disclaimers" className="text-gray-400 hover:text-blue-400 transition-colors">
                 Disclaimers
               </Link>
-              <Link href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
+              <Link href="/accessibility" className="text-gray-400 hover:text-blue-400 transition-colors">
                 Accessibility
               </Link>
             </div>
@@ -120,25 +152,21 @@ export default function Footer() {
           <h5 className="text-lg font-semibold mb-3 text-yellow-400">Important Legal Information</h5>
           <div className="text-sm text-gray-300 space-y-2">
             <p>
-              <strong>Payday Loan Disclosures:</strong> Payday loans are short-term loans intended for emergency use only. 
-              These loans have high interest rates and fees. Consider all alternatives before borrowing.
+              <strong>Loan Disclosures:</strong> All loans are subject to approval and terms. Fixed-fee loans have transparent 
+              pricing with no compound interest. Consider all alternatives before borrowing.
             </p>
             <p>
-              <strong>APR Disclosure:</strong> Annual Percentage Rates (APR) for payday loans can range from 200% to 1000% 
-              or higher. The actual APR will depend on the loan amount, term, and fees.
+              <strong>Provincial Regulations:</strong> Lending services are regulated differently across Canadian provinces. 
+              Please check your province's regulations before applying.
             </p>
-                         <p>
-               <strong>Provincial Restrictions:</strong> Payday loans are regulated differently across Canadian provinces. Please check your province's 
-               regulations before applying. Some provinces have restrictions on payday lending or prohibit it entirely.
-             </p>
             <p>
               <strong>Credit Impact:</strong> Late or missed payments may be reported to credit bureaus and could negatively 
               impact your credit score. We encourage responsible borrowing and timely repayment.
             </p>
-                         <p>
-               <strong>Licensing:</strong> PaydayExpress.ca operates under applicable provincial and federal lending laws. 
-               We are licensed and regulated in the provinces where we operate.
-             </p>
+            <p>
+              <strong>Licensing:</strong> PaydayExpress.ca operates under applicable provincial and federal lending laws. 
+              We are licensed and regulated in the provinces where we operate.
+            </p>
           </div>
         </div>
 
@@ -160,7 +188,7 @@ export default function Footer() {
             <svg className="w-6 h-6 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
-            <span className="text-gray-300 text-sm">BBB Accredited</span>
+            <span className="text-gray-300 text-sm">Blockchain Secured</span>
           </div>
           <div className="flex items-center space-x-2">
             <svg className="w-6 h-6 text-orange-400" fill="currentColor" viewBox="0 0 20 20">

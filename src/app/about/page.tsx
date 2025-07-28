@@ -32,33 +32,45 @@ export default function AboutPage() {
       {/* Hero Section */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div className="flex justify-center mb-6">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
-                <FaHeart className="text-white text-2xl" />
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="text-center lg:text-left">
+              <div className="flex justify-center lg:justify-start mb-6">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                  <FaHeart className="text-white text-2xl" />
+                </div>
+              </div>
+              <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+                Empowering Your Financial Future —
+                <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+                  Ethically, Transparently, Reliably
+                </span>
+              </h1>
+              <p className="text-xl text-gray-600 max-w-5xl mx-auto lg:mx-0 leading-relaxed mb-8">
+                At Payday Express, we're redefining how Canadians access short-term and peer-to-peer loans. 
+                Our mission is clear: to provide fast, fair, and fully transparent lending solutions that meet 
+                the evolving needs of modern borrowers—without hidden fees, inflated interest rates, or the 
+                red tape of traditional banking.
+              </p>
+              <p className="text-lg text-gray-700 max-w-4xl mx-auto lg:mx-0 leading-relaxed">
+                Founded with the belief that everyone deserves ethical access to capital, Payday Express combines 
+                financial expertise with smart technology to deliver a lending experience that's as empowering as it is seamless.
+              </p>
+              <div className="mt-10">
+                <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg">
+                  Apply Now
+                </button>
               </div>
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-              Empowering Your Financial Future —
-              <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-                Ethically, Transparently, Reliably
-              </span>
-            </h1>
-            <p className="text-xl text-gray-600 max-w-5xl mx-auto leading-relaxed mb-8">
-              At Payday Express, we're redefining how Canadians access short-term and peer-to-peer loans. 
-              Our mission is clear: to provide fast, fair, and fully transparent lending solutions that meet 
-              the evolving needs of modern borrowers—without hidden fees, inflated interest rates, or the 
-              red tape of traditional banking.
-            </p>
-            <p className="text-lg text-gray-700 max-w-4xl mx-auto leading-relaxed">
-              Founded with the belief that everyone deserves ethical access to capital, Payday Express combines 
-              financial expertise with smart technology to deliver a lending experience that's as empowering as it is seamless.
-            </p>
-            <div className="mt-10">
-              <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg">
-                Apply Now
-              </button>
+            <div className="flex justify-center lg:justify-end">
+              <div className="relative">
+                <img 
+                  src="/images/about.png" 
+                  alt="Payday Express Team" 
+                  className="rounded-2xl shadow-2xl max-w-full h-auto"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-blue-600/20 to-purple-600/20 rounded-2xl"></div>
+              </div>
             </div>
           </div>
         </div>

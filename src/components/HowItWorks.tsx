@@ -145,7 +145,7 @@ export default function HowItWorks() {
                 </div>
 
                 {/* Detailed Text */}
-                <div className="mt-4 p-4 bg-white rounded-xl border border-gray-200">
+                <div className="mt-2 p-4 bg-white rounded-xl border border-gray-200">
                   <h4 className="font-semibold text-gray-900 mb-2">
                     {step.detailedText.split('\n\n')[0]}
                   </h4>
@@ -195,7 +195,7 @@ export default function HowItWorks() {
                     </p>
 
                     {/* Step Image */}
-                    <div className="mt-4 rounded-2xl overflow-hidden w-full h-80 bg-gradient-to-br from-gray-50 to-gray-100 p-2">
+                    <div className="mt-2 rounded-2xl overflow-hidden w-full h-80 bg-gradient-to-br from-gray-50 to-gray-100 p-2">
                       <Image
                         src={step.image}
                         alt={`Step ${step.number} - ${step.title}`}

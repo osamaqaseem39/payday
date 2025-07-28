@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { FaHome, FaCalculator, FaShieldAlt, FaClock, FaCheckCircle, FaUsers, FaChartLine, FaMobile, FaCreditCard, FaHandshake, FaGlobe, FaLock, FaRocket, FaHeart, FaEye, FaArrowRight, FaKitchenSet, FaBath, FaPlus, FaHouse, FaWindowMaximize, FaDoorOpen, FaSnowflake, FaSun, FaSolarPanel, FaPaintBrush, FaTree, FaHammer, FaUserTie, FaGraduationCap, FaBriefcase, FaHome, FaGlobeAmericas, FaChartBar, FaLaptop, FaComments, FaUpload, FaBell, FaQuoteLeft } from 'react-icons/fa';
+import { FaHome, FaCalculator, FaShieldAlt, FaClock, FaCheckCircle, FaUsers, FaChartLine, FaMobile, FaCreditCard, FaHandshake, FaGlobe, FaLock, FaRocket, FaHeart, FaEye, FaArrowRight, FaBath, FaPlus, FaWindowMaximize, FaDoorOpen, FaSnowflake, FaSun, FaPaintBrush, FaTree, FaHammer, FaUserTie, FaGraduationCap, FaBriefcase, FaGlobeAmericas, FaChartBar, FaLaptop, FaComments, FaUpload, FaBell, FaQuoteLeft } from 'react-icons/fa';
 
 export default function HomeImprovementLoansPage() {
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -241,7 +241,7 @@ export default function HomeImprovementLoansPage() {
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center space-x-3">
-                  <FaKitchenSet className="text-green-600 flex-shrink-0" />
+                  <FaBath className="text-green-600 flex-shrink-0" />
                   <span className="text-gray-700">Kitchen and bathroom renovations</span>
                 </div>
                 <div className="flex items-center space-x-3">
@@ -249,7 +249,7 @@ export default function HomeImprovementLoansPage() {
                   <span className="text-gray-700">Room additions or basement finishing</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <FaHouse className="text-green-600 flex-shrink-0" />
+                  <FaHome className="text-green-600 flex-shrink-0" />
                   <span className="text-gray-700">Roof, windows, or door replacements</span>
                 </div>
                 <div className="flex items-center space-x-3">
@@ -257,7 +257,7 @@ export default function HomeImprovementLoansPage() {
                   <span className="text-gray-700">HVAC or plumbing system upgrades</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <FaSolarPanel className="text-green-600 flex-shrink-0" />
+                  <FaSun className="text-green-600 flex-shrink-0" />
                   <span className="text-gray-700">Solar panels or energy-efficient appliances</span>
                 </div>
                 <div className="flex items-center space-x-3">
@@ -364,7 +364,7 @@ export default function HomeImprovementLoansPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-8 text-center">
               <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <FaKitchenSet className="text-white text-2xl" />
+                <FaBath className="text-white text-2xl" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-4">Kitchen Remodel</h3>
               <p className="text-gray-700">Update cabinets, countertops, and appliances</p>
@@ -380,7 +380,7 @@ export default function HomeImprovementLoansPage() {
 
             <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-8 text-center">
               <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <FaHouse className="text-white text-2xl" />
+                <FaHome className="text-white text-2xl" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-4">Roof Replacement</h3>
               <p className="text-gray-700">Protect your home with quality roofing</p>
@@ -388,7 +388,7 @@ export default function HomeImprovementLoansPage() {
 
             <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-8 text-center">
               <div className="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <FaSolarPanel className="text-white text-2xl" />
+                <FaSun className="text-white text-2xl" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-4">Energy Upgrades</h3>
               <p className="text-gray-700">Solar panels and energy-efficient systems</p>

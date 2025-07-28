@@ -90,7 +90,7 @@ export default function HowItWorks() {
 
 
   return (
-    <section ref={sectionRef} id="how-it-works" className="py-16 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 overflow-hidden snap-y snap-mandatory">
+    <section ref={sectionRef} id="how-it-works" className="py-16 bg-gradient-to-b from-white  via-indigo-50 to-purple-50 overflow-hidden snap-y snap-mandatory">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">

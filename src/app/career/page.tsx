@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import CareerApplicationForm from '@/components/CareerApplicationForm';
 import { FaBriefcase, FaUsers, FaHeart, FaRocket, FaGraduationCap, FaHandshake, FaLightbulb, FaGlobe, FaCheckCircle, FaStar, FaMapMarkerAlt, FaClock } from 'react-icons/fa';
 
 export default function CareerPage() {
@@ -240,9 +241,12 @@ export default function CareerPage() {
                 <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">TypeScript</span>
                 <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">AWS</span>
               </div>
-              <button className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-                Apply Now
-              </button>
+                          <button 
+              onClick={() => document.getElementById('application-form')?.scrollIntoView({ behavior: 'smooth' })}
+              className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+            >
+              Apply Now
+            </button>
             </div>
 
             {/* Product Manager */}
@@ -271,9 +275,12 @@ export default function CareerPage() {
                 <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">Agile</span>
                 <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">Fintech</span>
               </div>
-              <button className="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition-colors">
-                Apply Now
-              </button>
+                          <button 
+              onClick={() => document.getElementById('application-form')?.scrollIntoView({ behavior: 'smooth' })}
+              className="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+            >
+              Apply Now
+            </button>
             </div>
 
             {/* Customer Success Manager */}
@@ -302,9 +309,12 @@ export default function CareerPage() {
                 <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">Problem Solving</span>
                 <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">Financial Services</span>
               </div>
-              <button className="w-full bg-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-purple-700 transition-colors">
-                Apply Now
-              </button>
+                          <button 
+              onClick={() => document.getElementById('application-form')?.scrollIntoView({ behavior: 'smooth' })}
+              className="w-full bg-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
+            >
+              Apply Now
+            </button>
             </div>
 
             {/* Data Analyst */}
@@ -333,9 +343,12 @@ export default function CareerPage() {
                 <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm">Tableau</span>
                 <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm">Statistics</span>
               </div>
-              <button className="w-full bg-orange-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-orange-700 transition-colors">
-                Apply Now
-              </button>
+                          <button 
+              onClick={() => document.getElementById('application-form')?.scrollIntoView({ behavior: 'smooth' })}
+              className="w-full bg-orange-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-orange-700 transition-colors"
+            >
+              Apply Now
+            </button>
             </div>
           </div>
         </div>
@@ -387,6 +400,13 @@ export default function CareerPage() {
         </div>
       </section>
 
+      {/* Application Form Section */}
+      <section id="application-form" className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <CareerApplicationForm />
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -399,8 +419,11 @@ export default function CareerPage() {
               with a team that values innovation, integrity, and impact, we'd love to hear from you.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg">
-                View All Positions
+              <button 
+                onClick={() => document.getElementById('application-form')?.scrollIntoView({ behavior: 'smooth' })}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg"
+              >
+                Apply Now
               </button>
               <button className="bg-white text-gray-900 px-8 py-4 rounded-lg font-semibold text-lg border-2 border-gray-300 hover:bg-gray-50 transition-all duration-300">
                 Contact HR

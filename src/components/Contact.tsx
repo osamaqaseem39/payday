@@ -1,50 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { FaEnvelope, FaPhone, FaClock, FaMapMarkerAlt, FaUser, FaMobile, FaEnvelopeOpen, FaFileAlt, FaComments, FaHeart } from 'react-icons/fa';
+import ContactForm from './ContactForm';
+import { FaEnvelope, FaPhone, FaClock, FaMapMarkerAlt, FaHeart } from 'react-icons/fa';
 
 export default function Contact() {
-  const [formData, setFormData] = useState({
-    fullName: '',
-    mobileNumber: '',
-    emailAddress: '',
-    subject: '',
-    message: ''
-  });
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setFormData({
-        fullName: '',
-        mobileNumber: '',
-        emailAddress: '',
-        subject: '',
-        message: ''
-      });
-    }, 3000);
-  };
 
   return (
     <section className="py-20 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
@@ -70,144 +30,14 @@ export default function Contact() {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12">
-          {/* Left Column - Why Reach Out and Contact Form */}
+          {/* Left Column - Contact Form and Information */}
           <div className="space-y-8">
-          
             {/* Contact Form */}
-            <div className="bg-white rounded-2xl shadow-xl p-8 lg:p-10">
-              <div className="mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">Contact Us</h2>
-                <p className="text-gray-600">We typically respond within 24–48 hours.</p>
-              </div>
+            <ContactForm />
 
-              {isSubmitted ? (
-                <div className="text-center py-12">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Message Sent!</h3>
-                  <p className="text-gray-600">Thank you for reaching out. We'll get back to you within 24-48 hours.</p>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
-                        <FaUser className="inline mr-2" />
-                        Full Name
-                      </label>
-                      <input
-                        type="text"
-                        id="fullName"
-                        name="fullName"
-                        value={formData.fullName}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-                        placeholder="Enter your full name"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="mobileNumber" className="block text-sm font-medium text-gray-700 mb-2">
-                        <FaMobile className="inline mr-2" />
-                        Mobile Number
-                      </label>
-                      <input
-                        type="tel"
-                        id="mobileNumber"
-                        name="mobileNumber"
-                        value={formData.mobileNumber}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-                        placeholder="Enter your mobile number"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="emailAddress" className="block text-sm font-medium text-gray-700 mb-2">
-                      <FaEnvelopeOpen className="inline mr-2" />
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      id="emailAddress"
-                      name="emailAddress"
-                      value={formData.emailAddress}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-                      placeholder="Enter your email address"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
-                      <FaFileAlt className="inline mr-2" />
-                      Subject
-                    </label>
-                    <select
-                      id="subject"
-                      name="subject"
-                      value={formData.subject}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-                    >
-                      <option value="">Select a subject</option>
-                      <option value="loan-inquiry">Loan Inquiry</option>
-                      <option value="account-assistance">Account Assistance</option>
-                      <option value="investment-guidance">Investment Guidance</option>
-                      <option value="business-partnership">Business Partnership</option>
-                      <option value="media-request">Media Request</option>
-                      <option value="general">General Inquiry</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                      <FaComments className="inline mr-2" />
-                      Message
-                    </label>
-                    <textarea
-                      id="message"
-                      name="message"
-                      value={formData.message}
-                      onChange={handleInputChange}
-                      required
-                      rows={6}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 resize-none"
-                      placeholder="Tell us how we can help you..."
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 px-8 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isSubmitting ? (
-                      <span className="flex items-center justify-center">
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Sending...
-                      </span>
-                    ) : (
-                      'Get in Touch'
-                    )}
-                  </button>
-                </form>
-              )}
-
-              {/* Let's Connect and Grow Section */}
-              <div className="mt-8 pt-8 border-t border-gray-200">
-                
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">Why Reach Out?</h3>
+            {/* Why Reach Out Section */}
+            <div className="bg-white rounded-2xl shadow-xl p-8">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">Why Reach Out?</h3>
               <h4 className="text-lg font-semibold text-gray-800 mb-4">Transparent Help for Real People</h4>
               <div className="space-y-3">
                 <div className="flex items-start space-x-3">
@@ -230,15 +60,11 @@ export default function Contact() {
                   <div className="w-2 h-2 bg-yellow-600 rounded-full mt-2 flex-shrink-0"></div>
                   <p className="text-gray-700">Media Requests – For press or public relations inquiries</p>
                 </div>
-                 
                 
                 <p className="text-lg text-blue-600 font-semibold text-center pt-4">
-                    Your future starts with one message. Let's talk.
-                  </p>
-                
+                  Your future starts with one message. Let's talk.
+                </p>
               </div>
-            </div>
-        
             </div>
           </div>
 

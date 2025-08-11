@@ -3,35 +3,68 @@
 import { useState, useEffect } from 'react';
 
 export default function LoanCalculator() {
+  const [loanType, setLoanType] = useState('');
   const [loanAmount, setLoanAmount] = useState(1500);
-  const [loanTerm, setLoanTerm] = useState(14);
-  const [fee, setFee] = useState(0);
+  const [companyFee, setCompanyFee] = useState(0);
+  const [investorShare, setInvestorShare] = useState(0);
+  const [durationType, setDurationType] = useState('days');
+  const [durationValue, setDurationValue] = useState(14);
+  const [lateFee, setLateFee] = useState(0);
   const [totalRepayment, setTotalRepayment] = useState(0);
+  const [perInstallment, setPerInstallment] = useState(0);
+  const [lateInstallment, setLateInstallment] = useState(0);
   const [apr, setApr] = useState(0);
   const [isCalculating, setIsCalculating] = useState(false);
 
-  // Calculate loan details when amount or term changes
+  // Update fees based on loan type
   useEffect(() => {
-    setIsCalculating(true);
-    
-    // Simulate calculation delay for better UX
-    const timer = setTimeout(() => {
-      // Canadian payday loan fee: $15 per $100 borrowed (standard rate)
-      const calculatedFee = Math.round((loanAmount / 100) * 15);
-      setFee(calculatedFee);
-      
-      const calculatedTotal = loanAmount + calculatedFee;
-      setTotalRepayment(calculatedTotal);
-      
-      // Calculate APR: (Fee / Loan Amount) * (365 / Term) * 100
-      const calculatedApr = ((calculatedFee / loanAmount) * (365 / loanTerm) * 100);
-      setApr(Math.round(calculatedApr));
-      
-      setIsCalculating(false);
-    }, 300);
+    if (loanType === 'personal') {
+      setCompanyFee(10);
+      setLateFee(20);
+    } else if (loanType === 'payday') {
+      setCompanyFee(5);
+      setLateFee(5);
+    } else {
+      setCompanyFee(0);
+      setLateFee(0);
+    }
+  }, [loanType]);
 
-    return () => clearTimeout(timer);
-  }, [loanAmount, loanTerm]);
+  // Calculate investor share based on loan amount
+  useEffect(() => {
+    if (loanAmount > 0) {
+      const calculatedInvestorShare = (loanAmount / 100) * 13;
+      setInvestorShare(calculatedInvestorShare);
+    }
+  }, [loanAmount]);
+
+  // Calculate loan details when inputs change
+  useEffect(() => {
+    if (loanAmount > 0 && companyFee > 0 && investorShare > 0 && durationValue > 0) {
+      setIsCalculating(true);
+      
+      // Simulate calculation delay for better UX
+      const timer = setTimeout(() => {
+        const calculatedTotal = loanAmount + companyFee + investorShare;
+        setTotalRepayment(calculatedTotal);
+        
+        const calculatedPerInstallment = calculatedTotal / durationValue;
+        setPerInstallment(calculatedPerInstallment);
+        
+        const calculatedLateInstallment = calculatedPerInstallment + lateFee;
+        setLateInstallment(calculatedLateInstallment);
+        
+        // Calculate APR based on duration type
+        const daysInTerm = durationType === 'days' ? durationValue : durationValue * 30;
+        const calculatedApr = ((companyFee + investorShare) / loanAmount) * (365 / daysInTerm) * 100;
+        setApr(Math.round(calculatedApr));
+        
+        setIsCalculating(false);
+      }, 300);
+
+      return () => clearTimeout(timer);
+    }
+  }, [loanAmount, companyFee, investorShare, durationValue, durationType, lateFee]);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
@@ -40,8 +73,19 @@ export default function LoanCalculator() {
     }
   };
 
-  const handleTermChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLoanTerm(parseInt(e.target.value));
+  const handleLoanTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setLoanType(e.target.value);
+  };
+
+  const handleDurationTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setDurationType(e.target.value);
+  };
+
+  const handleDurationValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    if (value > 0) {
+      setDurationValue(value);
+    }
   };
 
   return (
@@ -49,7 +93,7 @@ export default function LoanCalculator() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-            Loan Calculator
+            Fixed Rate Loan Calculator
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Use our loan calculator to see exactly how much you'll pay. 
@@ -61,16 +105,35 @@ export default function LoanCalculator() {
           {/* Calculator Form */}
           <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-glow border border-white/20 animate-fade-in-left flex flex-col">
             <h3 className="text-2xl font-bold text-gray-900 mb-2">Calculate Your Loan</h3>
-            <p className="text-gray-600 mb-6">Adjust the sliders below to see how your loan amount and term affect your total cost.</p>
+            <p className="text-gray-600 mb-6">Fill in the details below to see your loan breakdown.</p>
             
             <div className="space-y-6 flex-1">
+              {/* Loan Type */}
+              <div>
+                <label htmlFor="loanType" className="block text-lg font-semibold text-gray-800 mb-3">
+                  Loan Type 🏦
+                </label>
+                <select
+                  id="loanType"
+                  value={loanType}
+                  onChange={handleLoanTypeChange}
+                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg"
+                >
+                  <option value="">Select Type</option>
+                  <option value="personal">Personal Loan</option>
+                  <option value="payday">Payday Loan</option>
+                </select>
+                <p className="text-sm text-gray-500 mt-2">
+                  💡 Choose the loan type that best fits your needs.
+                </p>
+              </div>
+
               {/* Loan Amount */}
               <div>
                 <label htmlFor="loanAmount" className="block text-lg font-semibold text-gray-800 mb-3">
                   How much do you need? 💰
                 </label>
                 <div className="relative">
-                
                   <input
                     type="range"
                     id="loanAmount"
@@ -92,24 +155,91 @@ export default function LoanCalculator() {
                 </div>
               </div>
 
-              {/* Loan Term */}
+              {/* Company Fee (Read-only) */}
               <div>
-                <label htmlFor="loanTerm" className="block text-lg font-semibold text-gray-800 mb-3">
-                  How long do you need? ⏰
+                <label htmlFor="companyFee" className="block text-lg font-semibold text-gray-800 mb-3">
+                  Company Fee 💼
+                </label>
+                <input
+                  type="number"
+                  id="companyFee"
+                  value={companyFee}
+                  readOnly
+                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl bg-gray-50 text-lg"
+                />
+                <p className="text-sm text-gray-500 mt-2">
+                  💡 Fixed company fee based on loan type.
+                </p>
+              </div>
+
+              {/* Investor Share (Read-only) */}
+              <div>
+                <label htmlFor="investorShare" className="block text-lg font-semibold text-gray-800 mb-3">
+                  Investor Share 📈
+                </label>
+                <input
+                  type="number"
+                  id="investorShare"
+                  value={investorShare.toFixed(2)}
+                  readOnly
+                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl bg-gray-50 text-lg"
+                />
+                <p className="text-sm text-gray-500 mt-2">
+                  💡 13% of loan amount goes to investors.
+                </p>
+              </div>
+
+              {/* Duration Type */}
+              <div>
+                <label htmlFor="durationType" className="block text-lg font-semibold text-gray-800 mb-3">
+                  Duration Type ⏰
                 </label>
                 <select
-                  id="loanTerm"
-                  value={loanTerm}
-                  onChange={handleTermChange}
+                  id="durationType"
+                  value={durationType}
+                  onChange={handleDurationTypeChange}
                   className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg"
                 >
-                  <option value={7}>7 days - Shortest term</option>
-                  <option value={14}>14 days - Most popular</option>
-                  <option value={21}>21 days - Extended term</option>
-                  <option value={30}>30 days - Maximum term</option>
+                  <option value="days">Days</option>
+                  <option value="months">Months</option>
                 </select>
                 <p className="text-sm text-gray-500 mt-2">
-                  ⚡ Shorter terms mean lower total cost but higher monthly payments.
+                  ⚡ Choose how you want to measure the loan duration.
+                </p>
+              </div>
+
+              {/* Number of Installments */}
+              <div>
+                <label htmlFor="durationValue" className="block text-lg font-semibold text-gray-800 mb-3">
+                  Number of Installments 📅
+                </label>
+                <input
+                  type="number"
+                  id="durationValue"
+                  value={durationValue}
+                  onChange={handleDurationValueChange}
+                  min="1"
+                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg"
+                />
+                <p className="text-sm text-gray-500 mt-2">
+                  📊 How many payments you'll make to repay the loan.
+                </p>
+              </div>
+
+              {/* Late Fee (Read-only) */}
+              <div>
+                <label htmlFor="lateFee" className="block text-lg font-semibold text-gray-800 mb-3">
+                  Late Fee ⚠️
+                </label>
+                <input
+                  type="number"
+                  id="lateFee"
+                  value={lateFee}
+                  readOnly
+                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl bg-gray-50 text-lg"
+                />
+                <p className="text-sm text-gray-500 mt-2">
+                  💡 Additional fee if payment is late.
                 </p>
               </div>
 
@@ -137,17 +267,6 @@ export default function LoanCalculator() {
                   🎯 These are our most popular loan amounts. Click to instantly set your amount.
                 </p>
               </div>
-
-              {/* Fee Breakdown - Commented out */}
-              {/* <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 border border-blue-100 mt-auto">
-                <h4 className="font-semibold text-gray-800 mb-2">💰 Fee Structure</h4>
-                <div className="text-sm text-gray-600 space-y-1">
-                  <p>• $15 fee per $100 borrowed (standard rate)</p>
-                  <p>• No hidden fees or charges</p>
-                  <p>• Fixed fee regardless of loan term</p>
-                  <p>• No credit check required</p>
-                </div>
-              </div> */}
             </div>
           </div>
 
@@ -167,18 +286,42 @@ export default function LoanCalculator() {
               
               <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
                 <span className="flex items-center">
-                  <span className="mr-2">⏰</span>
-                  Loan Term
+                  <span className="mr-2">💼</span>
+                  Company Fee
                 </span>
-                <span className="font-bold">{loanTerm} days</span>
+                <span className="font-bold">${companyFee.toLocaleString()}</span>
               </div>
               
               <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
                 <span className="flex items-center">
-                  <span className="mr-2">💸</span>
-                  Fee
+                  <span className="mr-2">📈</span>
+                  Investor Share
                 </span>
-                <span className="font-bold">${fee.toLocaleString()}</span>
+                <span className="font-bold">${investorShare.toFixed(2)}</span>
+              </div>
+              
+              <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
+                <span className="flex items-center">
+                  <span className="mr-2">⏰</span>
+                  Duration
+                </span>
+                <span className="font-bold">{durationValue} {durationType}</span>
+              </div>
+              
+              <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
+                <span className="flex items-center">
+                  <span className="mr-2">📊</span>
+                  Per Installment
+                </span>
+                <span className="font-bold">${perInstallment.toFixed(2)}</span>
+              </div>
+              
+              <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
+                <span className="flex items-center">
+                  <span className="mr-2">⚠️</span>
+                  Installment with Late Fee
+                </span>
+                <span className="font-bold">${lateInstallment.toFixed(2)}</span>
               </div>
               
               <div className="flex justify-between items-center p-4 bg-white/20 rounded-lg border-2 border-white/30 hover:bg-white/25 transition-colors">
@@ -186,7 +329,7 @@ export default function LoanCalculator() {
                   <span className="mr-2">🎯</span>
                   Total Repayment
                 </span>
-                <span className="font-bold text-2xl">${totalRepayment.toLocaleString()}</span>
+                <span className="font-bold text-2xl">${totalRepayment.toFixed(2)}</span>
               </div>
               
               <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
@@ -205,12 +348,16 @@ export default function LoanCalculator() {
               </h4>
               <div className="text-sm space-y-2">
                 <div className="flex justify-between">
-                  <span>Due Date:</span>
-                  <span className="font-semibold">{new Date(Date.now() + loanTerm * 24 * 60 * 60 * 1000).toLocaleDateString('en-CA')}</span>
+                  <span>Number of Payments:</span>
+                  <span className="font-semibold">{durationValue}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Payment Amount:</span>
-                  <span className="font-semibold">${totalRepayment.toLocaleString()}</span>
+                  <span className="font-semibold">${perInstallment.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Late Payment Amount:</span>
+                  <span className="font-semibold">${lateInstallment.toFixed(2)}</span>
                 </div>
               </div>
             </div>

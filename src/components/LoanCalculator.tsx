@@ -2,90 +2,99 @@
 
 import { useState, useEffect } from 'react';
 
+// Simple Interest
+const simpleInterest = (principal: number, rate: number, time: number) => {
+  return principal * (rate / 100) * (time / 365);
+};
+
+// Compound Interest
+const compoundInterest = (principal: number, rate: number, time: number, frequency: number = 1) => {
+  return principal * Math.pow(1 + (rate / 100) / frequency, frequency * time) - principal;
+};
+
+// Monthly Payment (EMI)
+const monthlyPayment = (principal: number, rate: number, months: number) => {
+  const monthlyRate = rate / 100 / 12;
+  return principal * (monthlyRate * Math.pow(1 + monthlyRate, months)) / 
+         (Math.pow(1 + monthlyRate, months) - 1);
+};
+
 export default function LoanCalculator() {
-  const [loanType, setLoanType] = useState('');
-  const [loanAmount, setLoanAmount] = useState(1500);
-  const [companyFee, setCompanyFee] = useState(0);
-  const [investorShare, setInvestorShare] = useState(0);
-  const [durationType, setDurationType] = useState('days');
-  const [durationValue, setDurationValue] = useState(14);
-  const [lateFee, setLateFee] = useState(0);
+  const [calculationType, setCalculationType] = useState('simple');
+  const [principal, setPrincipal] = useState(1500);
+  const [rate, setRate] = useState(15);
+  const [time, setTime] = useState(30);
+  const [frequency, setFrequency] = useState(12);
   const [totalRepayment, setTotalRepayment] = useState(0);
-  const [perInstallment, setPerInstallment] = useState(0);
-  const [lateInstallment, setLateInstallment] = useState(0);
-  const [apr, setApr] = useState(0);
+  const [interestAmount, setInterestAmount] = useState(0);
+  const [monthlyEMI, setMonthlyEMI] = useState(0);
   const [isCalculating, setIsCalculating] = useState(false);
-
-  // Update fees based on loan type
-  useEffect(() => {
-    if (loanType === 'personal') {
-      setCompanyFee(10);
-      setLateFee(20);
-    } else if (loanType === 'payday') {
-      setCompanyFee(5);
-      setLateFee(5);
-    } else {
-      setCompanyFee(0);
-      setLateFee(0);
-    }
-  }, [loanType]);
-
-  // Calculate investor share based on loan amount
-  useEffect(() => {
-    if (loanAmount > 0) {
-      const calculatedInvestorShare = (loanAmount / 100) * 13;
-      setInvestorShare(calculatedInvestorShare);
-    }
-  }, [loanAmount]);
 
   // Calculate loan details when inputs change
   useEffect(() => {
-    if (loanAmount > 0 && companyFee > 0 && investorShare > 0 && durationValue > 0) {
+    if (principal > 0 && rate > 0 && time > 0) {
       setIsCalculating(true);
       
       // Simulate calculation delay for better UX
       const timer = setTimeout(() => {
-        const calculatedTotal = loanAmount + companyFee + investorShare;
-        setTotalRepayment(calculatedTotal);
-        
-        const calculatedPerInstallment = calculatedTotal / durationValue;
-        setPerInstallment(calculatedPerInstallment);
-        
-        const calculatedLateInstallment = calculatedPerInstallment + lateFee;
-        setLateInstallment(calculatedLateInstallment);
-        
-        // Calculate APR based on duration type
-        const daysInTerm = durationType === 'days' ? durationValue : durationValue * 30;
-        const calculatedApr = ((companyFee + investorShare) / loanAmount) * (365 / daysInTerm) * 100;
-        setApr(Math.round(calculatedApr));
+        let interest = 0;
+        let total = 0;
+        let emi = 0;
+
+        switch (calculationType) {
+          case 'simple':
+            interest = simpleInterest(principal, rate, time);
+            total = principal + interest;
+            break;
+          case 'compound':
+            interest = compoundInterest(principal, rate, time, frequency);
+            total = principal + interest;
+            break;
+          case 'emi':
+            emi = monthlyPayment(principal, rate, time);
+            total = emi * time;
+            interest = total - principal;
+            break;
+        }
+
+        setInterestAmount(interest);
+        setTotalRepayment(total);
+        setMonthlyEMI(emi);
         
         setIsCalculating(false);
       }, 300);
 
       return () => clearTimeout(timer);
     }
-  }, [loanAmount, companyFee, investorShare, durationValue, durationType, lateFee]);
+  }, [principal, rate, time, frequency, calculationType]);
 
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePrincipalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
-    if (value >= 100 && value <= 1500) {
-      setLoanAmount(value);
+    if (value >= 100 && value <= 50000) {
+      setPrincipal(value);
     }
   };
 
-  const handleLoanTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLoanType(e.target.value);
+  const handleRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value);
+    if (value >= 0 && value <= 100) {
+      setRate(value);
+    }
   };
 
-  const handleDurationTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setDurationType(e.target.value);
-  };
-
-  const handleDurationValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
     if (value > 0) {
-      setDurationValue(value);
+      setTime(value);
     }
+  };
+
+  const handleCalculationTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setCalculationType(e.target.value);
+  };
+
+  const handleFrequencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFrequency(parseInt(e.target.value));
   };
 
   return (
@@ -108,140 +117,114 @@ export default function LoanCalculator() {
             <p className="text-gray-600 mb-6">Fill in the details below to see your loan breakdown.</p>
             
             <div className="space-y-6 flex-1">
-              {/* Loan Type */}
+              {/* Calculation Type */}
               <div>
-                <label htmlFor="loanType" className="block text-lg font-semibold text-gray-800 mb-3">
-                  Loan Type 🏦
+                <label htmlFor="calculationType" className="block text-lg font-semibold text-gray-800 mb-3">
+                  Calculation Type 🏦
                 </label>
                 <select
-                  id="loanType"
-                  value={loanType}
-                  onChange={handleLoanTypeChange}
+                  id="calculationType"
+                  value={calculationType}
+                  onChange={handleCalculationTypeChange}
                   className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg"
                 >
-                  <option value="">Select Type</option>
-                  <option value="personal">Personal Loan</option>
-                  <option value="payday">Payday Loan</option>
+                  <option value="simple">Simple Interest</option>
+                  <option value="compound">Compound Interest</option>
+                  <option value="emi">Monthly EMI</option>
                 </select>
                 <p className="text-sm text-gray-500 mt-2">
-                  💡 Choose the loan type that best fits your needs.
+                  💡 Choose the type of interest calculation you want to use.
                 </p>
               </div>
 
-              {/* Loan Amount */}
+              {/* Principal Amount */}
               <div>
-                <label htmlFor="loanAmount" className="block text-lg font-semibold text-gray-800 mb-3">
-                  How much do you need? 💰
+                <label htmlFor="principal" className="block text-lg font-semibold text-gray-800 mb-3">
+                  Principal Amount 💰
                 </label>
                 <div className="relative">
                   <input
                     type="range"
-                    id="loanAmount"
+                    id="principal"
                     min="100"
-                    max="1500"
+                    max="50000"
                     step="100"
-                    value={loanAmount}
-                    onChange={handleAmountChange}
+                    value={principal}
+                    onChange={handlePrincipalChange}
                     className="w-full h-3 bg-gradient-to-r from-blue-200 to-purple-200 rounded-lg appearance-none cursor-pointer slider-thumb"
                   />
                   <div className="flex justify-between text-sm text-gray-500 mt-3">
                     <span className="text-xs">$100</span>
-                    <span className="font-bold text-blue-600 text-lg">${loanAmount.toLocaleString()}</span>
-                    <span className="text-xs">$1,500</span>
+                    <span className="font-bold text-blue-600 text-lg">${principal.toLocaleString()}</span>
+                    <span className="text-xs">$50,000</span>
                   </div>
                   <p className="text-sm text-gray-500 mt-2">
-                    💡 Choose an amount that covers your emergency needs without borrowing more than necessary.
+                    💡 Enter the principal amount you want to borrow.
                   </p>
                 </div>
               </div>
 
-              {/* Company Fee (Read-only) */}
+              {/* Interest Rate */}
               <div>
-                <label htmlFor="companyFee" className="block text-lg font-semibold text-gray-800 mb-3">
-                  Company Fee 💼
+                <label htmlFor="rate" className="block text-lg font-semibold text-gray-800 mb-3">
+                  Annual Interest Rate (%) 📊
                 </label>
                 <input
                   type="number"
-                  id="companyFee"
-                  value={companyFee}
-                  readOnly
-                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl bg-gray-50 text-lg"
-                />
-                <p className="text-sm text-gray-500 mt-2">
-                  💡 Fixed company fee based on loan type.
-                </p>
-              </div>
-
-              {/* Investor Share (Read-only) */}
-              <div>
-                <label htmlFor="investorShare" className="block text-lg font-semibold text-gray-800 mb-3">
-                  Investor Share 📈
-                </label>
-                <input
-                  type="number"
-                  id="investorShare"
-                  value={investorShare.toFixed(2)}
-                  readOnly
-                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl bg-gray-50 text-lg"
-                />
-                <p className="text-sm text-gray-500 mt-2">
-                  💡 13% of loan amount goes to investors.
-                </p>
-              </div>
-
-              {/* Duration Type */}
-              <div>
-                <label htmlFor="durationType" className="block text-lg font-semibold text-gray-800 mb-3">
-                  Duration Type ⏰
-                </label>
-                <select
-                  id="durationType"
-                  value={durationType}
-                  onChange={handleDurationTypeChange}
+                  id="rate"
+                  value={rate}
+                  onChange={handleRateChange}
+                  min="0"
+                  max="100"
+                  step="0.1"
                   className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg"
-                >
-                  <option value="days">Days</option>
-                  <option value="months">Months</option>
-                </select>
+                />
                 <p className="text-sm text-gray-500 mt-2">
-                  ⚡ Choose how you want to measure the loan duration.
+                  💡 Enter the annual interest rate as a percentage.
                 </p>
               </div>
 
-              {/* Number of Installments */}
+              {/* Time Period */}
               <div>
-                <label htmlFor="durationValue" className="block text-lg font-semibold text-gray-800 mb-3">
-                  Number of Installments 📅
+                <label htmlFor="time" className="block text-lg font-semibold text-gray-800 mb-3">
+                  {calculationType === 'emi' ? 'Loan Term (Months)' : 'Time Period (Days)'} ⏰
                 </label>
                 <input
                   type="number"
-                  id="durationValue"
-                  value={durationValue}
-                  onChange={handleDurationValueChange}
+                  id="time"
+                  value={time}
+                  onChange={handleTimeChange}
                   min="1"
                   className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg"
                 />
                 <p className="text-sm text-gray-500 mt-2">
-                  📊 How many payments you'll make to repay the loan.
+                  📊 {calculationType === 'emi' ? 'Enter the loan term in months.' : 'Enter the time period in days.'}
                 </p>
               </div>
 
-              {/* Late Fee (Read-only) */}
-              <div>
-                <label htmlFor="lateFee" className="block text-lg font-semibold text-gray-800 mb-3">
-                  Late Fee ⚠️
-                </label>
-                <input
-                  type="number"
-                  id="lateFee"
-                  value={lateFee}
-                  readOnly
-                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl bg-gray-50 text-lg"
-                />
-                <p className="text-sm text-gray-500 mt-2">
-                  💡 Additional fee if payment is late.
-                </p>
-              </div>
+              {/* Compounding Frequency (for compound interest) */}
+              {calculationType === 'compound' && (
+                <div>
+                  <label htmlFor="frequency" className="block text-lg font-semibold text-gray-800 mb-3">
+                    Compounding Frequency 📈
+                  </label>
+                  <select
+                    id="frequency"
+                    value={frequency}
+                    onChange={handleFrequencyChange}
+                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg"
+                  >
+                    <option value="1">Annually</option>
+                    <option value="2">Semi-annually</option>
+                    <option value="4">Quarterly</option>
+                    <option value="12">Monthly</option>
+                    <option value="365">Daily</option>
+                  </select>
+                  <p className="text-sm text-gray-500 mt-2">
+                    💡 How often interest is compounded per year.
+                  </p>
+                </div>
+              )}
 
               {/* Quick Amount Buttons */}
               <div>
@@ -249,12 +232,12 @@ export default function LoanCalculator() {
                   Quick Select Amount 🚀
                 </label>
                 <div className="grid grid-cols-2 gap-3">
-                  {[300, 500, 1000, 1500].map((amount) => (
+                  {[1000, 5000, 10000, 25000].map((amount) => (
                     <button
                       key={amount}
-                      onClick={() => setLoanAmount(amount)}
+                      onClick={() => setPrincipal(amount)}
                       className={`px-4 py-3 rounded-xl border-2 transition-all duration-200 font-semibold ${
-                        loanAmount === amount
+                        principal === amount
                           ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white border-blue-600 shadow-lg scale-105'
                           : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400 hover:shadow-md hover:scale-102'
                       }`}
@@ -264,7 +247,7 @@ export default function LoanCalculator() {
                   ))}
                 </div>
                 <p className="text-sm text-gray-500 mt-2">
-                  🎯 These are our most popular loan amounts. Click to instantly set your amount.
+                  🎯 These are popular loan amounts. Click to instantly set your amount.
                 </p>
               </div>
             </div>
@@ -279,50 +262,44 @@ export default function LoanCalculator() {
               <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
                 <span className="flex items-center">
                   <span className="mr-2">💵</span>
-                  Loan Amount
+                  Principal Amount
                 </span>
-                <span className="font-bold text-xl">${loanAmount.toLocaleString()}</span>
-              </div>
-              
-              <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
-                <span className="flex items-center">
-                  <span className="mr-2">💼</span>
-                  Company Fee
-                </span>
-                <span className="font-bold">${companyFee.toLocaleString()}</span>
-              </div>
-              
-              <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
-                <span className="flex items-center">
-                  <span className="mr-2">📈</span>
-                  Investor Share
-                </span>
-                <span className="font-bold">${investorShare.toFixed(2)}</span>
-              </div>
-              
-              <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
-                <span className="flex items-center">
-                  <span className="mr-2">⏰</span>
-                  Duration
-                </span>
-                <span className="font-bold">{durationValue} {durationType}</span>
+                <span className="font-bold text-xl">${principal.toLocaleString()}</span>
               </div>
               
               <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
                 <span className="flex items-center">
                   <span className="mr-2">📊</span>
-                  Per Installment
+                  Interest Rate
                 </span>
-                <span className="font-bold">${perInstallment.toFixed(2)}</span>
+                <span className="font-bold">{rate}%</span>
               </div>
               
               <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
                 <span className="flex items-center">
-                  <span className="mr-2">⚠️</span>
-                  Installment with Late Fee
+                  <span className="mr-2">⏰</span>
+                  Time Period
                 </span>
-                <span className="font-bold">${lateInstallment.toFixed(2)}</span>
+                <span className="font-bold">{time} {calculationType === 'emi' ? 'months' : 'days'}</span>
               </div>
+              
+              <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
+                <span className="flex items-center">
+                  <span className="mr-2">📈</span>
+                  Interest Amount
+                </span>
+                <span className="font-bold">${interestAmount.toFixed(2)}</span>
+              </div>
+              
+              {calculationType === 'emi' && monthlyEMI > 0 && (
+                <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
+                  <span className="flex items-center">
+                    <span className="mr-2">📊</span>
+                    Monthly EMI
+                  </span>
+                  <span className="font-bold">${monthlyEMI.toFixed(2)}</span>
+                </div>
+              )}
               
               <div className="flex justify-between items-center p-4 bg-white/20 rounded-lg border-2 border-white/30 hover:bg-white/25 transition-colors">
                 <span className="font-bold flex items-center">
@@ -331,34 +308,30 @@ export default function LoanCalculator() {
                 </span>
                 <span className="font-bold text-2xl">${totalRepayment.toFixed(2)}</span>
               </div>
-              
-              <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
-                <span className="flex items-center">
-                  <span className="mr-2">📊</span>
-                  APR
-                </span>
-                <span className="font-bold">{apr.toLocaleString()}%</span>
-              </div>
             </div>
 
             <div className="mt-6 p-4 bg-white/10 rounded-lg">
               <h4 className="font-semibold mb-2 flex items-center">
                 <span className="mr-2">📅</span>
-                Payment Schedule
+                Calculation Details
               </h4>
               <div className="text-sm space-y-2">
                 <div className="flex justify-between">
-                  <span>Number of Payments:</span>
-                  <span className="font-semibold">{durationValue}</span>
+                  <span>Calculation Type:</span>
+                  <span className="font-semibold capitalize">{calculationType} Interest</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Payment Amount:</span>
-                  <span className="font-semibold">${perInstallment.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Late Payment Amount:</span>
-                  <span className="font-semibold">${lateInstallment.toFixed(2)}</span>
-                </div>
+                {calculationType === 'compound' && (
+                  <div className="flex justify-between">
+                    <span>Compounding Frequency:</span>
+                    <span className="font-semibold">{frequency} times per year</span>
+                  </div>
+                )}
+                {calculationType === 'emi' && (
+                  <div className="flex justify-between">
+                    <span>Number of Payments:</span>
+                    <span className="font-semibold">{time}</span>
+                  </div>
+                )}
               </div>
             </div>
 

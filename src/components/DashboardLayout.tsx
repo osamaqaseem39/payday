@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '../contexts/AuthContext';
 import { 
   HiHome, 
   HiBriefcase, 
@@ -14,7 +15,9 @@ import {
   HiMenu,
   HiX,
   HiBell,
-  HiUserCircle
+  HiUserCircle,
+  HiLogout,
+  HiShieldCheck
 } from 'react-icons/hi';
 
 const navigation = [
@@ -32,6 +35,7 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const { user, logout } = useAuth();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -47,6 +51,19 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             >
               <HiX className="h-6 w-6" />
             </button>
+          </div>
+          
+          {/* User Profile Mobile */}
+          <div className="px-4 py-3 border-b border-gray-200">
+            <div className="flex items-center">
+              <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                <HiUserCircle className="h-5 w-5 text-blue-600" />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+                <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
+              </div>
+            </div>
           </div>
           <nav className="flex-1 space-y-1 px-2 py-4">
             {navigation.map((item) => {
@@ -71,6 +88,26 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </Link>
               );
             })}
+            
+            {/* Admin Navigation - Only visible to admins */}
+            {user?.role === 'admin' && (
+              <Link
+                href="/dashboard/admin"
+                className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors ${
+                  pathname === '/dashboard/admin'
+                    ? 'bg-red-100 text-red-900'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <HiShieldCheck
+                  className={`mr-3 h-5 w-5 flex-shrink-0 ${
+                    pathname === '/dashboard/admin' ? 'text-red-500' : 'text-gray-400 group-hover:text-gray-500'
+                  }`}
+                />
+                Admin
+              </Link>
+            )}
           </nav>
         </div>
       </div>
@@ -103,6 +140,25 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </Link>
               );
             })}
+            
+            {/* Admin Navigation - Only visible to admins */}
+            {user?.role === 'admin' && (
+              <Link
+                href="/dashboard/admin"
+                className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors ${
+                  pathname === '/dashboard/admin'
+                    ? 'bg-red-100 text-red-900'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <HiShieldCheck
+                  className={`mr-3 h-5 w-5 flex-shrink-0 ${
+                    pathname === '/dashboard/admin' ? 'text-red-500' : 'text-gray-400 group-hover:text-gray-500'
+                  }`}
+                />
+                Admin
+              </Link>
+            )}
           </nav>
         </div>
       </div>
@@ -129,9 +185,21 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <HiBell className="h-6 w-6" />
               </button>
               <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200" />
-              <button className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
-                <HiUserCircle className="h-6 w-6" />
-              </button>
+              
+              {/* User Profile */}
+              <div className="flex items-center gap-x-3">
+                <div className="text-right">
+                  <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+                  <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
+                </div>
+                <button
+                  onClick={logout}
+                  className="flex items-center gap-x-2 px-3 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
+                >
+                  <HiLogout className="h-4 w-4" />
+                  <span className="hidden lg:inline">Sign out</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -14,6 +14,7 @@ import {
   HiXCircle
 } from 'react-icons/hi';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+import ProtectedRoute from '../../components/ProtectedRoute';
 
 const stats = [
   { name: 'Total Applications', value: '2,847', change: '+12%', changeType: 'positive', icon: HiDocumentText },
@@ -87,8 +88,9 @@ export default function DashboardPage() {
   const [selectedPeriod, setSelectedPeriod] = useState('6M');
 
   return (
-    <DashboardLayout>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+    <ProtectedRoute>
+      <DashboardLayout>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
         <div className="space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between">
@@ -242,6 +244,7 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+      </DashboardLayout>
+    </ProtectedRoute>
   );
 } 

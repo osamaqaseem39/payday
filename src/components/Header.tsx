@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -10,6 +11,7 @@ export default function Header() {
   const [isLoansDropdownOpen, setIsLoansDropdownOpen] = useState(false);
   const [isPaydayExpressDropdownOpen, setIsPaydayExpressDropdownOpen] = useState(false);
   const [isLendingTypesDropdownOpen, setIsLendingTypesDropdownOpen] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -156,18 +158,37 @@ export default function Header() {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link
-              href="/signin"
-              className="bg-white text-gray-900 px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors font-medium"
-            >
-              Sign in
-            </Link>
-            <Link
-              href="/apply"
-              className="bg-gray-900 text-green-500 px-6 py-2 rounded-lg hover:bg-gray-800 transition-colors font-medium"
-            >
-              Apply now
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                >
+                  Dashboard
+                </Link>
+                <button
+                  onClick={logout}
+                  className="bg-white text-gray-900 px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors font-medium"
+                >
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="bg-white text-gray-900 px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors font-medium"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/apply"
+                  className="bg-gray-900 text-green-500 px-6 py-2 rounded-lg hover:bg-gray-800 transition-colors font-medium"
+                >
+                  Apply now
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -342,20 +363,43 @@ export default function Header() {
               </Link>
               
               <div className="px-3 py-2 space-y-2">
-                <Link
-                  href="/signin"
-                  className="block bg-white text-gray-900 px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors text-center"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Sign in
-                </Link>
-                <Link
-                  href="/apply"
-                  className="block bg-gray-900 text-green-500 px-6 py-2 rounded-lg hover:bg-gray-800 transition-colors text-center"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Apply now
-                </Link>
+                {isAuthenticated ? (
+                  <>
+                    <Link
+                      href="/dashboard"
+                      className="block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors text-center"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setIsMenuOpen(false);
+                      }}
+                      className="block w-full bg-white text-gray-900 px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors text-center"
+                    >
+                      Sign out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      className="block bg-white text-gray-900 px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors text-center"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Sign in
+                    </Link>
+                    <Link
+                      href="/apply"
+                      className="block bg-gray-900 text-green-500 px-6 py-2 rounded-lg hover:bg-gray-800 transition-colors text-center"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Apply now
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>

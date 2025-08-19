@@ -2,110 +2,142 @@
 
 import { useState, useEffect } from 'react';
 
-// Simple Interest
-const simpleInterest = (principal: number, rate: number, time: number) => {
-  return principal * (rate / 100) * (time / 365);
+// Loan category data from the database
+const loanCategories = [
+  {
+    id: 1,
+    name: 'Personal Loan',
+    status: 'Active',
+    fixedRate: 13.00,
+    maxDays: 25,
+    maxLimit: 1500.00,
+    loanType: 'Pay Day',
+    companyFee: 10.00
+  },
+  {
+    id: 2,
+    name: 'Business Loan',
+    status: 'Active',
+    fixedRate: 10.00,
+    maxDays: 75,
+    maxLimit: 20000.00,
+    loanType: 'Investors Fund',
+    companyFee: 3000.00
+  },
+  {
+    id: 3,
+    name: 'Student Loan',
+    status: 'Inactive',
+    fixedRate: 5.00,
+    maxDays: 120,
+    maxLimit: 300000.00,
+    loanType: 'Investors Fund',
+    companyFee: 1000.00
+  },
+  {
+    id: 4,
+    name: 'Car Loan',
+    status: 'Active',
+    fixedRate: 8.75,
+    maxDays: 540,
+    maxLimit: 1000000.00,
+    loanType: 'Peer To Peer',
+    companyFee: 2500.00
+  },
+  {
+    id: 5,
+    name: 'Home Renovation Loan',
+    status: 'Active',
+    fixedRate: 9.50,
+    maxDays: 365,
+    maxLimit: 750000.00,
+    loanType: 'Peer To Peer',
+    companyFee: 1800.00
+  }
+];
+
+// New Loan Calculation Formula
+const calculateTotalLoanAmount = (amount: number, fixedRatePercentage: number) => {
+  return amount + (fixedRatePercentage / 100 * amount);
 };
 
-// Compound Interest
-const compoundInterest = (principal: number, rate: number, time: number, frequency: number = 1) => {
-  return principal * Math.pow(1 + (rate / 100) / frequency, frequency * time) - principal;
-};
-
-// Monthly Payment (EMI)
-const monthlyPayment = (principal: number, rate: number, months: number) => {
-  const monthlyRate = rate / 100 / 12;
-  return principal * (monthlyRate * Math.pow(1 + monthlyRate, months)) / 
-         (Math.pow(1 + monthlyRate, months) - 1);
+const calculateInstallment = (totalLoanAmount: number, timeInDays: number, paymentFrequency: 'weekly' | 'monthly') => {
+  if (paymentFrequency === 'weekly') {
+    const weeks = Math.ceil(timeInDays / 7);
+    return totalLoanAmount / weeks;
+  } else {
+    const months = Math.ceil(timeInDays / 30);
+    return totalLoanAmount / months;
+  }
 };
 
 export default function LoanCalculator() {
-  const [calculationType, setCalculationType] = useState('simple');
+  const [selectedCategory, setSelectedCategory] = useState(loanCategories[0]);
   const [principal, setPrincipal] = useState(1500);
-  const [rate, setRate] = useState(15);
-  const [time, setTime] = useState(30);
-  const [frequency, setFrequency] = useState(12);
   const [totalRepayment, setTotalRepayment] = useState(0);
-  const [interestAmount, setInterestAmount] = useState(0);
-  const [monthlyEMI, setMonthlyEMI] = useState(0);
+  const [fixedRateAmount, setFixedRateAmount] = useState(0);
+  const [weeklyInstallment, setWeeklyInstallment] = useState(0);
+  const [monthlyInstallment, setMonthlyInstallment] = useState(0);
   const [isCalculating, setIsCalculating] = useState(false);
+
+  // Update calculator values when loan category changes
+  useEffect(() => {
+    if (selectedCategory) {
+      setPrincipal(Math.min(principal, selectedCategory.maxLimit));
+    }
+  }, [selectedCategory]);
 
   // Calculate loan details when inputs change
   useEffect(() => {
-    if (principal > 0 && rate > 0 && time > 0) {
+    if (principal > 0 && selectedCategory) {
       setIsCalculating(true);
       
       // Simulate calculation delay for better UX
       const timer = setTimeout(() => {
-        let interest = 0;
-        let total = 0;
-        let emi = 0;
+        const totalLoanAmount = calculateTotalLoanAmount(principal, selectedCategory.fixedRate);
+        const fixedRate = totalLoanAmount - principal;
+        const weeklyInstallment = calculateInstallment(totalLoanAmount, selectedCategory.maxDays, 'weekly');
+        const monthlyInstallment = calculateInstallment(totalLoanAmount, selectedCategory.maxDays, 'monthly');
 
-        switch (calculationType) {
-          case 'simple':
-            interest = simpleInterest(principal, rate, time);
-            total = principal + interest;
-            break;
-          case 'compound':
-            interest = compoundInterest(principal, rate, time, frequency);
-            total = principal + interest;
-            break;
-          case 'emi':
-            emi = monthlyPayment(principal, rate, time);
-            total = emi * time;
-            interest = total - principal;
-            break;
-        }
-
-        setInterestAmount(interest);
-        setTotalRepayment(total);
-        setMonthlyEMI(emi);
+        setFixedRateAmount(fixedRate);
+        setTotalRepayment(totalLoanAmount);
+        setWeeklyInstallment(weeklyInstallment);
+        setMonthlyInstallment(monthlyInstallment);
         
         setIsCalculating(false);
       }, 300);
 
       return () => clearTimeout(timer);
     }
-  }, [principal, rate, time, frequency, calculationType]);
+  }, [principal, selectedCategory]);
+
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const category = loanCategories.find(cat => cat.id === parseInt(e.target.value));
+    if (category) {
+      setSelectedCategory(category);
+    }
+  };
 
   const handlePrincipalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
-    if (value >= 100 && value <= 50000) {
+    if (value >= 100 && value <= selectedCategory.maxLimit) {
       setPrincipal(value);
     }
   };
 
-  const handleRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(e.target.value);
-    if (value >= 0 && value <= 100) {
-      setRate(value);
-    }
-  };
 
-  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value);
-    if (value > 0) {
-      setTime(value);
-    }
-  };
 
-  const handleCalculationTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setCalculationType(e.target.value);
-  };
 
-  const handleFrequencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFrequency(parseInt(e.target.value));
-  };
 
   return (
     <section id="calculator" className="py-20 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-            Fixed Rate Loan Calculator
+            Fixed Rate Loan Calculator with Installments
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Use our loan calculator to see exactly how much you'll pay. 
+            Use our loan calculator to see exactly how much you'll pay and your weekly/monthly installments. 
             No surprises, no hidden fees - just clear, transparent pricing.
           </p>
         </div>
@@ -117,25 +149,46 @@ export default function LoanCalculator() {
             <p className="text-gray-600 mb-6">Fill in the details below to see your loan breakdown.</p>
             
             <div className="space-y-6 flex-1">
-              {/* Calculation Type */}
+              {/* Loan Category Selection */}
               <div>
-                <label htmlFor="calculationType" className="block text-lg font-semibold text-gray-800 mb-3">
-                  Calculation Type 🏦
+                <label htmlFor="loanCategory" className="block text-lg font-semibold text-gray-800 mb-3">
+                  Loan Category 🏦
                 </label>
                 <select
-                  id="calculationType"
-                  value={calculationType}
-                  onChange={handleCalculationTypeChange}
+                  id="loanCategory"
+                  value={selectedCategory.id}
+                  onChange={handleCategoryChange}
                   className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg"
                 >
-                  <option value="simple">Simple Interest</option>
-                  <option value="compound">Compound Interest</option>
-                  <option value="emi">Monthly EMI</option>
+                  {loanCategories.map(category => (
+                    <option key={category.id} value={category.id}>
+                      {category.name} {category.status === 'Inactive' ? '(Currently Unavailable)' : ''}
+                    </option>
+                  ))}
                 </select>
-                <p className="text-sm text-gray-500 mt-2">
-                  💡 Choose the type of interest calculation you want to use.
-                </p>
+                <div className="mt-2 p-3 bg-blue-50 rounded-lg">
+                  <div className="text-sm text-blue-800 space-y-1">
+                    <div className="flex justify-between">
+                      <span>Loan Type:</span>
+                      <span className="font-semibold">{selectedCategory.loanType}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Max Amount:</span>
+                      <span className="font-semibold">${selectedCategory.maxLimit.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Max Term:</span>
+                      <span className="font-semibold">{selectedCategory.maxDays} days</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Company Fee:</span>
+                      <span className="font-semibold">${selectedCategory.companyFee.toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
+
+
 
               {/* Principal Amount */}
               <div>
@@ -147,7 +200,7 @@ export default function LoanCalculator() {
                     type="range"
                     id="principal"
                     min="100"
-                    max="50000"
+                    max={selectedCategory.maxLimit}
                     step="100"
                     value={principal}
                     onChange={handlePrincipalChange}
@@ -156,75 +209,39 @@ export default function LoanCalculator() {
                   <div className="flex justify-between text-sm text-gray-500 mt-3">
                     <span className="text-xs">$100</span>
                     <span className="font-bold text-blue-600 text-lg">${principal.toLocaleString()}</span>
-                    <span className="text-xs">$50,000</span>
+                    <span className="text-xs">${selectedCategory.maxLimit.toLocaleString()}</span>
                   </div>
                   <p className="text-sm text-gray-500 mt-2">
-                    💡 Enter the principal amount you want to borrow.
+                    💡 Enter the principal amount you want to borrow (max: ${selectedCategory.maxLimit.toLocaleString()}).
                   </p>
                 </div>
               </div>
 
-              {/* Interest Rate */}
+              {/* Fixed Rate Display */}
               <div>
-                <label htmlFor="rate" className="block text-lg font-semibold text-gray-800 mb-3">
-                  Annual Interest Rate (%) 📊
+                <label className="block text-lg font-semibold text-gray-800 mb-3">
+                  Annual Fixed Rate 📊
                 </label>
-                <input
-                  type="number"
-                  id="rate"
-                  value={rate}
-                  onChange={handleRateChange}
-                  min="0"
-                  max="100"
-                  step="0.1"
-                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg"
-                />
-                <p className="text-sm text-gray-500 mt-2">
-                  💡 Enter the annual interest rate as a percentage.
-                </p>
-              </div>
-
-              {/* Time Period */}
-              <div>
-                <label htmlFor="time" className="block text-lg font-semibold text-gray-800 mb-3">
-                  {calculationType === 'emi' ? 'Loan Term (Months)' : 'Time Period (Days)'} ⏰
-                </label>
-                <input
-                  type="number"
-                  id="time"
-                  value={time}
-                  onChange={handleTimeChange}
-                  min="1"
-                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg"
-                />
-                <p className="text-sm text-gray-500 mt-2">
-                  📊 {calculationType === 'emi' ? 'Enter the loan term in months.' : 'Enter the time period in days.'}
-                </p>
-              </div>
-
-              {/* Compounding Frequency (for compound interest) */}
-              {calculationType === 'compound' && (
-                <div>
-                  <label htmlFor="frequency" className="block text-lg font-semibold text-gray-800 mb-3">
-                    Compounding Frequency 📈
-                  </label>
-                  <select
-                    id="frequency"
-                    value={frequency}
-                    onChange={handleFrequencyChange}
-                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg"
-                  >
-                    <option value="1">Annually</option>
-                    <option value="2">Semi-annually</option>
-                    <option value="4">Quarterly</option>
-                    <option value="12">Monthly</option>
-                    <option value="365">Daily</option>
-                  </select>
-                  <p className="text-sm text-gray-500 mt-2">
-                    💡 How often interest is compounded per year.
-                  </p>
+                <div className="w-full px-4 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-lg font-semibold text-blue-600">
+                  {selectedCategory.fixedRate}%
                 </div>
-              )}
+                <p className="text-sm text-gray-500 mt-2">
+                  💡 Fixed rate for {selectedCategory.name} - cannot be modified
+                </p>
+              </div>
+
+              {/* Time Period Display */}
+              <div>
+                <label className="block text-lg font-semibold text-gray-800 mb-3">
+                  Loan Term (Days) ⏰
+                </label>
+                <div className="w-full px-4 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-lg font-semibold text-blue-600">
+                  {selectedCategory.maxDays} days
+                </div>
+                <p className="text-sm text-gray-500 mt-2">
+                  📊 Fixed term for {selectedCategory.name} - cannot be modified
+                </p>
+              </div>
 
               {/* Quick Amount Buttons */}
               <div>
@@ -232,7 +249,7 @@ export default function LoanCalculator() {
                   Quick Select Amount 🚀
                 </label>
                 <div className="grid grid-cols-2 gap-3">
-                  {[1000, 5000, 10000, 25000].map((amount) => (
+                  {[1000, 5000, 10000, Math.min(25000, selectedCategory.maxLimit)].map((amount) => (
                     <button
                       key={amount}
                       onClick={() => setPrincipal(amount)}
@@ -261,6 +278,14 @@ export default function LoanCalculator() {
             <div className="space-y-4 flex-1">
               <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
                 <span className="flex items-center">
+                  <span className="mr-2">🏦</span>
+                  Loan Category
+                </span>
+                <span className="font-bold text-lg">{selectedCategory.name}</span>
+              </div>
+
+              <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
+                <span className="flex items-center">
                   <span className="mr-2">💵</span>
                   Principal Amount
                 </span>
@@ -270,43 +295,57 @@ export default function LoanCalculator() {
               <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
                 <span className="flex items-center">
                   <span className="mr-2">📊</span>
-                  Interest Rate
+                  Fixed Rate
                 </span>
-                <span className="font-bold">{rate}%</span>
+                <span className="font-bold">{selectedCategory.fixedRate}%</span>
               </div>
               
               <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
                 <span className="flex items-center">
                   <span className="mr-2">⏰</span>
-                  Time Period
+                  Loan Term
                 </span>
-                <span className="font-bold">{time} {calculationType === 'emi' ? 'months' : 'days'}</span>
+                <span className="font-bold">{selectedCategory.maxDays} days</span>
               </div>
               
               <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
                 <span className="flex items-center">
                   <span className="mr-2">📈</span>
-                  Interest Amount
+                  Fixed Rate Amount
                 </span>
-                <span className="font-bold">${interestAmount.toFixed(2)}</span>
+                <span className="font-bold">${fixedRateAmount.toFixed(2)}</span>
               </div>
-              
-              {calculationType === 'emi' && monthlyEMI > 0 && (
-                <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
-                  <span className="flex items-center">
-                    <span className="mr-2">📊</span>
-                    Monthly EMI
-                  </span>
-                  <span className="font-bold">${monthlyEMI.toFixed(2)}</span>
-                </div>
-              )}
+
+              <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
+                <span className="flex items-center">
+                  <span className="mr-2">💼</span>
+                  Company Fee
+                </span>
+                <span className="font-bold">${selectedCategory.companyFee.toFixed(2)}</span>
+              </div>
+
+              <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
+                <span className="flex items-center">
+                  <span className="mr-2">📅</span>
+                  Weekly Installment
+                </span>
+                <span className="font-bold">${weeklyInstallment.toFixed(2)}</span>
+              </div>
+
+              <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
+                <span className="flex items-center">
+                  <span className="mr-2">📅</span>
+                  Monthly Installment
+                </span>
+                <span className="font-bold">${monthlyInstallment.toFixed(2)}</span>
+              </div>
               
               <div className="flex justify-between items-center p-4 bg-white/20 rounded-lg border-2 border-white/30 hover:bg-white/25 transition-colors">
                 <span className="font-bold flex items-center">
                   <span className="mr-2">🎯</span>
                   Total Repayment
                 </span>
-                <span className="font-bold text-2xl">${totalRepayment.toFixed(2)}</span>
+                <span className="font-bold text-2xl">${(totalRepayment + selectedCategory.companyFee).toFixed(2)}</span>
               </div>
             </div>
 
@@ -318,20 +357,12 @@ export default function LoanCalculator() {
               <div className="text-sm space-y-2">
                 <div className="flex justify-between">
                   <span>Calculation Type:</span>
-                  <span className="font-semibold capitalize">{calculationType} Interest</span>
+                  <span className="font-semibold capitalize">Fixed Rate + Installments</span>
                 </div>
-                {calculationType === 'compound' && (
-                  <div className="flex justify-between">
-                    <span>Compounding Frequency:</span>
-                    <span className="font-semibold">{frequency} times per year</span>
-                  </div>
-                )}
-                {calculationType === 'emi' && (
-                  <div className="flex justify-between">
-                    <span>Number of Payments:</span>
-                    <span className="font-semibold">{time}</span>
-                  </div>
-                )}
+                <div className="flex justify-between">
+                  <span>Loan Type:</span>
+                  <span className="font-semibold">{selectedCategory.loanType}</span>
+                </div>
               </div>
             </div>
 
@@ -364,6 +395,9 @@ export default function LoanCalculator() {
             </p>
             <p>
               • This service is available to Canadian residents only. Rates and terms may vary by province.
+            </p>
+            <p>
+              • Company fees are additional to the calculated fixed rate and will be added to your total repayment amount.
             </p>
           </div>
         </div>

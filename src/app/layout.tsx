@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { AuthProvider } from "../contexts/AuthContext";
 
 const gilroy = localFont({
   src: [
@@ -47,7 +48,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${gilroy.variable} font-gilroy`}>{children}</body>
+      <body className={`${gilroy.variable} font-gilroy`}>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </body>
     </html>
   );
 }

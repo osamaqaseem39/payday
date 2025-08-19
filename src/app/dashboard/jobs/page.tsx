@@ -19,6 +19,7 @@ interface Job {
 }
 
 import DashboardLayout from '../../../components/DashboardLayout';
+import ProtectedRoute from '../../../components/ProtectedRoute';
 
 export default function JobsPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -33,10 +34,65 @@ export default function JobsPage() {
   const fetchJobs = async () => {
     try {
       const response = await fetch('http://localhost:3002/api/jobs');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
-      setJobs(data);
+      // Ensure data is an array
+      if (Array.isArray(data)) {
+        setJobs(data);
+      } else {
+        console.error('API returned non-array data:', data);
+        setJobs([]);
+      }
     } catch (error) {
       console.error('Error fetching jobs:', error);
+      // Fallback to mock data for development
+      const mockJobs = [
+        {
+          _id: '1',
+          title: 'Software Developer',
+          department: 'Engineering',
+          location: 'Remote',
+          type: 'full-time',
+          experience: '3-5 years',
+          salary: '$80,000 - $120,000',
+          description: 'Full-stack developer position',
+          deadline: '2024-02-15',
+          status: 'active',
+          postedDate: '2024-01-15',
+          applicationsCount: 12
+        },
+        {
+          _id: '2',
+          title: 'UI/UX Designer',
+          department: 'Design',
+          location: 'New York',
+          type: 'full-time',
+          experience: '2-4 years',
+          salary: '$70,000 - $100,000',
+          description: 'Creative designer position',
+          deadline: '2024-02-20',
+          status: 'active',
+          postedDate: '2024-01-16',
+          applicationsCount: 8
+        },
+        {
+          _id: '3',
+          title: 'Product Manager',
+          department: 'Product',
+          location: 'San Francisco',
+          type: 'full-time',
+          experience: '5-7 years',
+          salary: '$120,000 - $150,000',
+          description: 'Product strategy role',
+          deadline: '2024-02-25',
+          status: 'draft',
+          postedDate: '2024-01-17',
+          applicationsCount: 0
+        }
+      ];
+      setJobs(mockJobs);
     } finally {
       setLoading(false);
     }
@@ -82,8 +138,9 @@ export default function JobsPage() {
   }
 
   return (
-    <DashboardLayout>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+    <ProtectedRoute>
+      <DashboardLayout>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
         <div className="space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between">
@@ -120,7 +177,8 @@ export default function JobsPage() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {jobs.map((job) => (
+                  {jobs && jobs.length > 0 ? (
+                    jobs.map((job) => (
                     <tr key={job._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
@@ -162,13 +220,21 @@ export default function JobsPage() {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                  ))
+                  ) : (
+                    <tr>
+                      <td colSpan={8} className="px-6 py-4 text-center text-gray-500">
+                        No jobs found
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
           </div>
         </div>
       </div>
-    </DashboardLayout>
+      </DashboardLayout>
+    </ProtectedRoute>
   );
 } 

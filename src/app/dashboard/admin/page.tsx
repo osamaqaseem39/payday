@@ -9,10 +9,11 @@ const API_BASE_URL = 'https://payday-server.vercel.app/api';
 
 interface User {
   _id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  role: 'admin' | 'hr' | 'manager' | 'user';
-  status: 'active' | 'inactive';
+  role: 'admin' | 'hr_manager' | 'hr_staff' | 'interviewer';
+  isActive: boolean;
   createdAt: string;
 }
 
@@ -22,10 +23,11 @@ export default function AdminPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
-    role: 'user' as 'admin' | 'hr' | 'manager' | 'user',
-    status: 'active' as 'active' | 'inactive'
+    role: 'hr_staff' as 'admin' | 'hr_manager' | 'hr_staff' | 'interviewer',
+    isActive: true
   });
 
   useEffect(() => {
@@ -101,7 +103,7 @@ export default function AdminPage() {
       
       setShowModal(false);
       setEditingUser(null);
-      setFormData({ name: '', email: '', role: 'user', status: 'active' });
+             setFormData({ firstName: '', lastName: '', email: '', role: 'hr_staff', isActive: true });
     } catch (error) {
       console.error('Error saving user:', error);
     }
@@ -110,10 +112,11 @@ export default function AdminPage() {
   const handleEdit = (user: User) => {
     setEditingUser(user);
     setFormData({
-      name: user.name,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
       role: user.role,
-      status: user.status
+      isActive: user.isActive
     });
     setShowModal(true);
   };
@@ -141,12 +144,12 @@ export default function AdminPage() {
     switch (role) {
       case 'admin':
         return 'bg-red-100 text-red-800';
-      case 'hr':
+      case 'hr_manager':
         return 'bg-blue-100 text-blue-800';
-      case 'manager':
+      case 'hr_staff':
         return 'bg-green-100 text-green-800';
-      case 'user':
-        return 'bg-gray-100 text-gray-800';
+      case 'interviewer':
+        return 'bg-purple-100 text-purple-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -213,10 +216,10 @@ export default function AdminPage() {
                             <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
                               <HiUser className="h-5 w-5 text-blue-600" />
                             </div>
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                              <div className="text-sm text-gray-500">{user.email}</div>
-                            </div>
+                                                         <div className="ml-4">
+                               <div className="text-sm font-medium text-gray-900">{user.firstName} {user.lastName}</div>
+                               <div className="text-sm text-gray-500">{user.email}</div>
+                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -225,11 +228,11 @@ export default function AdminPage() {
                             {user.role}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(user.status)}`}>
-                            {user.status}
-                          </span>
-                        </td>
+                                                 <td className="px-6 py-4 whitespace-nowrap">
+                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(user.isActive ? 'active' : 'inactive')}`}>
+                             {user.isActive ? 'active' : 'inactive'}
+                           </span>
+                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {new Date(user.createdAt).toLocaleDateString()}
                         </td>
@@ -269,16 +272,26 @@ export default function AdminPage() {
                   {editingUser ? 'Edit User' : 'Add New User'}
                 </h3>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Name</label>
-                    <input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      required
-                    />
-                  </div>
+                                     <div>
+                     <label className="block text-sm font-medium text-gray-700">First Name</label>
+                     <input
+                       type="text"
+                       value={formData.firstName}
+                       onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                       required
+                     />
+                   </div>
+                   <div>
+                     <label className="block text-sm font-medium text-gray-700">Last Name</label>
+                     <input
+                       type="text"
+                       value={formData.lastName}
+                       onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                       required
+                     />
+                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Email</label>
                     <input
@@ -291,36 +304,36 @@ export default function AdminPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Role</label>
-                    <select
-                      value={formData.role}
-                      onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    >
-                      <option value="user">User</option>
-                      <option value="manager">Department Manager</option>
-                      <option value="hr">HR Manager</option>
-                      <option value="admin">Administrator</option>
-                    </select>
+                                         <select
+                       value={formData.role}
+                       onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
+                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                     >
+                       <option value="hr_staff">HR Staff</option>
+                       <option value="interviewer">Interviewer</option>
+                       <option value="hr_manager">HR Manager</option>
+                       <option value="admin">Administrator</option>
+                     </select>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Status</label>
-                    <select
-                      value={formData.status}
-                      onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                    >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                    </select>
-                  </div>
+                                     <div>
+                     <label className="block text-sm font-medium text-gray-700">Status</label>
+                     <select
+                       value={formData.isActive ? 'active' : 'inactive'}
+                       onChange={(e) => setFormData({ ...formData, isActive: e.target.value === 'active' })}
+                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                     >
+                       <option value="active">Active</option>
+                       <option value="inactive">Inactive</option>
+                     </select>
+                   </div>
                   <div className="flex justify-end space-x-3 pt-4">
                     <button
                       type="button"
-                      onClick={() => {
-                        setShowModal(false);
-                        setEditingUser(null);
-                        setFormData({ name: '', email: '', role: 'user', status: 'active' });
-                      }}
+                                             onClick={() => {
+                         setShowModal(false);
+                         setEditingUser(null);
+                         setFormData({ firstName: '', lastName: '', email: '', role: 'hr_staff', isActive: true });
+                       }}
                       className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
                     >
                       Cancel

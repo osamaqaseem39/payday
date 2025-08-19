@@ -50,30 +50,8 @@ export default function InterviewsPage() {
       }
     } catch (error) {
       console.error('Error fetching interviews:', error);
-      // Fallback to mock data for development
-      const mockInterviews = [
-        {
-          _id: '1',
-          candidateId: { _id: '1', name: 'John Doe', email: 'john@example.com' },
-          jobId: { _id: '1', title: 'Software Developer' },
-          date: '2024-01-20T10:00:00Z',
-          type: 'technical',
-          interviewer: 'Sarah Johnson',
-          status: 'scheduled',
-          notes: 'Technical skills assessment'
-        },
-        {
-          _id: '2',
-          candidateId: { _id: '2', name: 'Jane Smith', email: 'jane@example.com' },
-          jobId: { _id: '2', title: 'UI/UX Designer' },
-          date: '2024-01-21T14:00:00Z',
-          type: 'behavioral',
-          interviewer: 'Mike Chen',
-          status: 'completed',
-          notes: 'Cultural fit interview'
-        }
-      ];
-      setInterviews(mockInterviews);
+      // Error occurred, set empty array
+      setInterviews([]);
     } finally {
       setLoading(false);
     }

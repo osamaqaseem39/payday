@@ -43,30 +43,8 @@ export default function CandidatesPage() {
       }
     } catch (error) {
       console.error('Error fetching candidates:', error);
-      // Fallback to mock data for development
-      const mockCandidates = [
-        {
-          _id: '1',
-          name: 'John Doe',
-          email: 'john@example.com',
-          phone: '+1-555-0123',
-          experience: '5 years in web development',
-          skills: ['React', 'Node.js', 'MongoDB'],
-          status: 'active',
-          appliedDate: '2024-01-15'
-        },
-        {
-          _id: '2',
-          name: 'Jane Smith',
-          email: 'jane@example.com',
-          phone: '+1-555-0124',
-          experience: '3 years in UI/UX design',
-          skills: ['Figma', 'Adobe XD', 'Sketch'],
-          status: 'active',
-          appliedDate: '2024-01-16'
-        }
-      ];
-      setCandidates(mockCandidates);
+      // Error occurred, set empty array
+      setCandidates([]);
     } finally {
       setLoading(false);
     }

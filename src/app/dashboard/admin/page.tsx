@@ -48,65 +48,13 @@ export default function AdminPage() {
           setUsers([]);
         }
       } else {
-        // Fallback to mock data for development
-        const mockUsers: User[] = [
-          {
-            _id: '1',
-            name: 'Admin User',
-            email: 'admin@payday.com',
-            role: 'admin' as const,
-            status: 'active' as const,
-            createdAt: '2024-01-01'
-          },
-          {
-            _id: '2',
-            name: 'HR Manager',
-            email: 'hr@payday.com',
-            role: 'hr' as const,
-            status: 'active' as const,
-            createdAt: '2024-01-02'
-          },
-          {
-            _id: '3',
-            name: 'Department Manager',
-            email: 'manager@payday.com',
-            role: 'manager' as const,
-            status: 'active' as const,
-            createdAt: '2024-01-03'
-          },
-          {
-            _id: '4',
-            name: 'Regular User',
-            email: 'user@payday.com',
-            role: 'user' as const,
-            status: 'inactive' as const,
-            createdAt: '2024-01-04'
-          }
-        ];
-        setUsers(mockUsers);
+        // No users found
+        setUsers([]);
       }
     } catch (error) {
       console.error('Error fetching users:', error);
-      // Use mock data as fallback
-      const mockUsers: User[] = [
-        {
-          _id: '1',
-          name: 'Admin User',
-          email: 'admin@payday.com',
-          role: 'admin' as const,
-          status: 'active' as const,
-          createdAt: '2024-01-01'
-        },
-        {
-          _id: '2',
-          name: 'HR Manager',
-          email: 'hr@payday.com',
-          role: 'hr' as const,
-          status: 'active' as const,
-          createdAt: '2024-01-02'
-        }
-      ];
-      setUsers(mockUsers);
+      // Error occurred, set empty array
+      setUsers([]);
     } finally {
       setLoading(false);
     }

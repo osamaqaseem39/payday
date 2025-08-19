@@ -50,30 +50,8 @@ export default function ApplicationsPage() {
       }
     } catch (error) {
       console.error('Error fetching applications:', error);
-      // Fallback to mock data for development
-      const mockApplications = [
-        {
-          _id: '1',
-          jobId: { _id: '1', title: 'Software Developer' },
-          candidateId: { _id: '1', name: 'John Doe', email: 'john@example.com' },
-          status: 'pending',
-          appliedDate: '2024-01-15',
-          resume: 'resume.pdf',
-          coverLetter: 'cover.pdf',
-          experience: '5 years in web development'
-        },
-        {
-          _id: '2',
-          jobId: { _id: '2', title: 'UI/UX Designer' },
-          candidateId: { _id: '2', name: 'Jane Smith', email: 'jane@example.com' },
-          status: 'reviewed',
-          appliedDate: '2024-01-14',
-          resume: 'resume.pdf',
-          coverLetter: 'cover.pdf',
-          experience: '3 years in design'
-        }
-      ];
-      setApplications(mockApplications);
+      // Error occurred, set empty array
+      setApplications([]);
     } finally {
       setLoading(false);
     }

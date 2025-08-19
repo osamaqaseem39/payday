@@ -217,18 +217,7 @@ export default function LoanCalculator() {
                 </div>
               </div>
 
-              {/* Fixed Rate Display */}
-              <div>
-                <label className="block text-lg font-semibold text-gray-800 mb-3">
-                  Annual Fixed Rate 📊
-                </label>
-                <div className="w-full px-4 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-lg font-semibold text-blue-600">
-                  {selectedCategory.fixedRate}%
-                </div>
-                <p className="text-sm text-gray-500 mt-2">
-                  💡 Fixed rate for {selectedCategory.name} - cannot be modified
-                </p>
-              </div>
+
 
               {/* Time Period Display */}
               <div>
@@ -292,13 +281,7 @@ export default function LoanCalculator() {
                 <span className="font-bold text-xl">${principal.toLocaleString()}</span>
               </div>
               
-              <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
-                <span className="flex items-center">
-                  <span className="mr-2">📊</span>
-                  Fixed Rate
-                </span>
-                <span className="font-bold">{selectedCategory.fixedRate}%</span>
-              </div>
+
               
               <div className="flex justify-between items-center p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors">
                 <span className="flex items-center">

@@ -5,6 +5,8 @@ import { HiUser, HiShieldCheck, HiPencil, HiTrash, HiPlus } from 'react-icons/hi
 import DashboardLayout from '../../../components/DashboardLayout';
 import ProtectedRoute from '../../../components/ProtectedRoute';
 
+const API_BASE_URL = 'https://payday-server.vercel.app/api';
+
 interface User {
   _id: string;
   name: string;
@@ -32,7 +34,7 @@ export default function AdminPage() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('http://localhost:3002/api/admin/users', {
+      const response = await fetch('${API_BASE_URL}/admin/users', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`
         }
@@ -116,7 +118,7 @@ export default function AdminPage() {
     try {
       if (editingUser) {
         // Update existing user
-        const response = await fetch(`http://localhost:3002/api/admin/users/${editingUser._id}`, {
+        const response = await fetch(`${API_BASE_URL}/admin/users/${editingUser._id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -134,7 +136,7 @@ export default function AdminPage() {
         }
       } else {
         // Create new user
-        const response = await fetch('http://localhost:3002/api/admin/users', {
+        const response = await fetch('${API_BASE_URL}/admin/users', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -171,7 +173,7 @@ export default function AdminPage() {
   const handleDelete = async (userId: string) => {
     if (confirm('Are you sure you want to delete this user?')) {
       try {
-        const response = await fetch(`http://localhost:3002/api/admin/users/${userId}`, {
+        const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`

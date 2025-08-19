@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { HiEye, HiPencil, HiTrash, HiCalendar, HiClock, HiCheckCircle, HiXCircle } from 'react-icons/hi';
 
+const API_BASE_URL = 'https://payday-server.vercel.app/api';
+
 interface Interview {
   _id: string;
   candidateId: {
@@ -34,7 +36,7 @@ export default function InterviewsPage() {
 
   const fetchInterviews = async () => {
     try {
-      const response = await fetch('http://localhost:3002/api/interviews');
+      const response = await fetch(`${API_BASE_URL}/interviews`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

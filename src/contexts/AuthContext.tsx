@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
+const API_BASE_URL = 'https://payday-server.vercel.app/api';
+
 interface User {
   _id: string;
   email: string;
@@ -36,7 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkAuthStatus = async (token: string) => {
     try {
-      const response = await fetch('http://localhost:3002/api/auth/me', {
+      const response = await fetch(`${API_BASE_URL}/auth/me`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -58,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const response = await fetch('http://localhost:3002/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -83,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
     try {
-      const response = await fetch('http://localhost:3002/api/auth/register', {
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

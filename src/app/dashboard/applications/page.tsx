@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { HiEye, HiCheckCircle, HiXCircle, HiClock } from 'react-icons/hi';
 
+const API_BASE_URL = 'https://payday-server.vercel.app/api';
+
 interface Application {
   _id: string;
   jobId: {
@@ -34,7 +36,7 @@ export default function ApplicationsPage() {
 
   const fetchApplications = async () => {
     try {
-      const response = await fetch('http://localhost:3002/api/applications');
+      const response = await fetch(`${API_BASE_URL}/applications`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { FaPaperPlane, FaSpinner, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
+import FileUpload from './FileUpload';
+import { getApiUrl } from '@/config/api';
 
 interface FormData {
   firstName: string;
@@ -11,7 +13,7 @@ interface FormData {
   position: string;
   experience: string;
   coverLetter: string;
-  resume: File | null;
+  resume: { url: string; name: string } | null;
 }
 
 export default function CareerApplicationForm() {
@@ -38,11 +40,10 @@ export default function CareerApplicationForm() {
     }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
+  const handleFileUploaded = (fileUrl: string, fileName: string) => {
     setFormData(prev => ({
       ...prev,
-      resume: file
+      resume: { url: fileUrl, name: fileName }
     }));
   };
 
@@ -53,16 +54,25 @@ export default function CareerApplicationForm() {
     setErrorMessage('');
 
     try {
-      const formDataToSend = new FormData();
-      Object.entries(formData).forEach(([key, value]) => {
-        if (value !== null) {
-          formDataToSend.append(key, value);
-        }
-      });
+      // Prepare data for dashboard server
+      const applicationData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        position: formData.position,
+        experience: formData.experience,
+        coverLetter: formData.coverLetter,
+        resumeUrl: formData.resume?.url || '',
+        resumeName: formData.resume?.name || ''
+      };
 
-      const response = await fetch('/api/career-application', {
+      const response = await fetch(getApiUrl('/api/career-applications/submit'), {
         method: 'POST',
-        body: formDataToSend,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(applicationData),
       });
 
       if (response.ok) {
@@ -255,21 +265,29 @@ export default function CareerApplicationForm() {
         </div>
 
         <div>
-          <label htmlFor="resume" className="block text-sm font-medium text-gray-700 mb-2">
-            Resume/CV *
-          </label>
-          <input
-            type="file"
-            id="resume"
-            name="resume"
-            onChange={handleFileChange}
-            required
-            accept=".pdf,.doc,.docx"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          <FileUpload
+            onFileUploaded={handleFileUploaded}
+            allowedTypes={['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']}
+            maxSize={5}
+            label="Resume/CV"
+            placeholder="Upload your resume or CV (PDF, DOC, DOCX)"
+            required={true}
           />
-          <p className="text-sm text-gray-500 mt-1">
-            Accepted formats: PDF, DOC, DOCX (Max 5MB)
-          </p>
+          {formData.resume && (
+            <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                  <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-green-900">{formData.resume.name}</p>
+                  <p className="text-xs text-green-600">Successfully uploaded</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="pt-6">

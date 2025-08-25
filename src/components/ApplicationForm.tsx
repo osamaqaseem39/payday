@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import FileUpload from './FileUpload';
 
 export default function ApplicationForm() {
   const [formData, setFormData] = useState({
@@ -20,9 +21,10 @@ export default function ApplicationForm() {
     bankName: '',
     accountNumber: '',
     routingNumber: '',
-         loanAmount: '1500',
+    loanAmount: '1500',
     loanPurpose: '',
-    agreeToTerms: false
+    agreeToTerms: false,
+    documents: [] as { url: string; name: string; type: string }[]
   });
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -35,6 +37,21 @@ export default function ApplicationForm() {
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleFileUploaded = (fileUrl: string, fileName: string) => {
+    const fileType = fileName.split('.').pop()?.toLowerCase() || 'document';
+    setFormData(prev => ({
+      ...prev,
+      documents: [...prev.documents, { url: fileUrl, name: fileName, type: fileType }]
+    }));
+  };
+
+  const removeDocument = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      documents: prev.documents.filter((_, i) => i !== index)
     }));
   };
 
@@ -304,6 +321,55 @@ export default function ApplicationForm() {
           />
         </div>
       )}
+
+      {/* Document Upload Section */}
+      <div className="space-y-4">
+        <h4 className="text-lg font-medium text-gray-900">Supporting Documents</h4>
+        <p className="text-sm text-gray-600">
+          Upload any supporting documents (ID, pay stubs, bank statements, etc.) to help expedite your application.
+        </p>
+        
+        <FileUpload
+          onFileUploaded={handleFileUploaded}
+          allowedTypes={['image/*', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']}
+          maxSize={5}
+          label="Upload Document"
+          placeholder="Drag and drop files here or click to browse"
+        />
+
+        {/* Display uploaded documents */}
+        {formData.documents.length > 0 && (
+          <div className="space-y-2">
+            <h5 className="text-sm font-medium text-gray-700">Uploaded Documents:</h5>
+            <div className="space-y-2">
+              {formData.documents.map((doc, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{doc.name}</p>
+                      <p className="text-xs text-gray-500">{doc.type.toUpperCase()} file</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeDocument(index)}
+                    className="text-red-500 hover:text-red-700 p-1"
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 

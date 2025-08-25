@@ -23,6 +23,7 @@ import {
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HiHome },
   { name: 'Applications', href: '/dashboard/applications', icon: HiDocumentText },
+  { name: 'Career Applications', href: '/dashboard/career-applications', icon: HiDocumentText },
   { name: 'Jobs', href: '/dashboard/jobs', icon: HiBriefcase },
   { name: 'Candidates', href: '/dashboard/candidates', icon: HiUsers },
   { name: 'Interviews', href: '/dashboard/interviews', icon: HiCalendar },

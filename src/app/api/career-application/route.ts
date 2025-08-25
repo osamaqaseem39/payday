@@ -1,6 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 
+// Database connection (you'll need to set up your MongoDB connection)
+const MONGODB_URI = process.env.MONGODB_URI;
+
+async function connectDB() {
+  if (!MONGODB_URI) {
+    throw new Error('MONGODB_URI is not defined');
+  }
+  
+  const { MongoClient } = await import('mongodb');
+  const client = new MongoClient(MONGODB_URI);
+  await client.connect();
+  return client.db();
+}
+
 // Configure SMTP transporter
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
@@ -24,35 +38,50 @@ export async function POST(request: NextRequest) {
     const position = formData.get('position') as string;
     const experience = formData.get('experience') as string;
     const coverLetter = formData.get('coverLetter') as string;
-    const resume = formData.get('resume') as File;
+    const resumeUrl = formData.get('resumeUrl') as string;
+    const resumeName = formData.get('resumeName') as string;
 
     // Validate required fields
-    if (!firstName || !lastName || !email || !phone || !position || !experience || !coverLetter || !resume) {
+    if (!firstName || !lastName || !email || !phone || !position || !experience || !coverLetter || !resumeUrl || !resumeName) {
       return NextResponse.json(
         { message: 'All fields are required' },
         { status: 400 }
       );
     }
 
-    // Validate file size (5MB limit)
-    if (resume.size > 5 * 1024 * 1024) {
+    // Save to database
+    let db;
+    try {
+      db = await connectDB();
+      const careerApplications = db.collection('careerapplications');
+      
+      const applicationData = {
+        firstName,
+        lastName,
+        email,
+        phone,
+        position,
+        experience,
+        coverLetter,
+        resume: {
+          url: resumeUrl,
+          name: resumeName,
+          uploadedAt: new Date()
+        },
+        status: 'pending',
+        applicationDate: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      await careerApplications.insertOne(applicationData);
+    } catch (dbError) {
+      console.error('Database error:', dbError);
       return NextResponse.json(
-        { message: 'Resume file size must be less than 5MB' },
-        { status: 400 }
+        { message: 'Failed to save application to database' },
+        { status: 500 }
       );
     }
-
-    // Validate file type
-    const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-    if (!allowedTypes.includes(resume.type)) {
-      return NextResponse.json(
-        { message: 'Resume must be in PDF, DOC, or DOCX format' },
-        { status: 400 }
-      );
-    }
-
-    // Convert file to buffer for email attachment
-    const resumeBuffer = Buffer.from(await resume.arrayBuffer());
 
     // Email content for HR
     const hrEmailContent = `
@@ -62,8 +91,10 @@ export async function POST(request: NextRequest) {
       <p><strong>Phone:</strong> ${phone}</p>
       <p><strong>Position Applied For:</strong> ${position}</p>
       <p><strong>Years of Experience:</strong> ${experience}</p>
+      <p><strong>Resume:</strong> <a href="${resumeUrl}" target="_blank">${resumeName}</a></p>
       <h3>Cover Letter:</h3>
       <p>${coverLetter.replace(/\n/g, '<br>')}</p>
+      <p><em>Application ID: ${Date.now()}</em></p>
     `;
 
     // Email content for applicant (confirmation)
@@ -89,13 +120,6 @@ export async function POST(request: NextRequest) {
       to: process.env.HR_EMAIL || 'hr@paydayexpress.com',
       subject: `New Career Application: ${firstName} ${lastName} - ${position}`,
       html: hrEmailContent,
-      attachments: [
-        {
-          filename: resume.name,
-          content: resumeBuffer,
-          contentType: resume.type,
-        },
-      ],
     };
 
     // Send confirmation email to applicant

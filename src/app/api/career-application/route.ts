@@ -1,19 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 
-// Database connection (you'll need to set up your MongoDB connection)
-const MONGODB_URI = process.env.MONGODB_URI;
-
-async function connectDB() {
-  if (!MONGODB_URI) {
-    throw new Error('MONGODB_URI is not defined');
-  }
-  
-  const { MongoClient } = await import('mongodb');
-  const client = new MongoClient(MONGODB_URI);
-  await client.connect();
-  return client.db();
-}
+// Dashboard server configuration
+const DASHBOARD_SERVER = process.env.NEXT_PUBLIC_DASHBOARD_SERVER || 'https://payday-server.vercel.app';
 
 // Configure SMTP transporter
 const transporter = nodemailer.createTransport({
@@ -25,6 +14,28 @@ const transporter = nodemailer.createTransport({
     pass: process.env.SMTP_PASS,
   },
 });
+
+// Helper function to submit to dashboard server
+async function submitToDashboard(applicationData: any) {
+  try {
+    const response = await fetch(`${DASHBOARD_SERVER}/api/career-applications`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(applicationData)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Dashboard server error: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Dashboard submission error:', error);
+    throw error;
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -49,38 +60,35 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Save to database
-    let db;
-    try {
-      db = await connectDB();
-      const careerApplications = db.collection('careerapplications');
-      
-      const applicationData = {
-        firstName,
-        lastName,
-        email,
-        phone,
-        position,
-        experience,
-        coverLetter,
-        resume: {
-          url: resumeUrl,
-          name: resumeName,
-          uploadedAt: new Date()
-        },
-        status: 'pending',
-        applicationDate: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
+    // Prepare application data for dashboard
+    const applicationData = {
+      firstName,
+      lastName,
+      email,
+      phone,
+      position,
+      experience,
+      coverLetter,
+      resume: {
+        url: resumeUrl,
+        name: resumeName,
+        uploadedAt: new Date()
+      },
+      status: 'pending',
+      applicationDate: new Date(),
+      source: 'website',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
 
-      await careerApplications.insertOne(applicationData);
-    } catch (dbError) {
-      console.error('Database error:', dbError);
-      return NextResponse.json(
-        { message: 'Failed to save application to database' },
-        { status: 500 }
-      );
+    // Submit to dashboard server (if available)
+    let dashboardResult = null;
+    try {
+      dashboardResult = await submitToDashboard(applicationData);
+      console.log('✅ Application submitted to dashboard server');
+    } catch (dashboardError) {
+      console.log('⚠️ Dashboard server unavailable, continuing with local processing');
+      // Continue with local processing even if dashboard fails
     }
 
     // Email content for HR
@@ -95,6 +103,7 @@ export async function POST(request: NextRequest) {
       <h3>Cover Letter:</h3>
       <p>${coverLetter.replace(/\n/g, '<br>')}</p>
       <p><em>Application ID: ${Date.now()}</em></p>
+      ${dashboardResult ? `<p><em>Dashboard ID: ${dashboardResult._id}</em></p>` : ''}
     `;
 
     // Email content for applicant (confirmation)
@@ -108,6 +117,7 @@ export async function POST(request: NextRequest) {
         <li>Position: ${position}</li>
         <li>Experience Level: ${experience}</li>
         <li>Application Date: ${new Date().toLocaleDateString()}</li>
+        ${dashboardResult ? `<li>Application ID: ${dashboardResult._id}</li>` : ''}
       </ul>
       <p>Our HR team will review your application and contact you within 5-7 business days if your qualifications match our requirements.</p>
       <p>If you have any questions, please don't hesitate to reach out to us at careers@paydayexpress.com</p>
@@ -137,7 +147,11 @@ export async function POST(request: NextRequest) {
     ]);
 
     return NextResponse.json(
-      { message: 'Application submitted successfully' },
+      { 
+        message: 'Application submitted successfully',
+        dashboardId: dashboardResult?._id,
+        applicationId: Date.now()
+      },
       { status: 200 }
     );
 

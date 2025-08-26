@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// This is a placeholder API route for the dashboard to fetch career applications
-// In a real implementation, this would connect to your MongoDB database
+// This API route should proxy requests to the backend server
+// DO NOT connect to database directly from frontend API routes
+// All database operations should be handled by the backend server
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,7 +13,12 @@ export async function GET(request: NextRequest) {
     const position = searchParams.get('position');
     const search = searchParams.get('search');
 
-    // Mock data for testing - replace with actual database query
+    // TODO: Replace mock data with proxy to backend server
+    // const backendUrl = process.env.NEXT_PUBLIC_DASHBOARD_SERVER || 'https://payday-server.vercel.app';
+    // const response = await fetch(`${backendUrl}/api/career-applications?${searchParams.toString()}`);
+    // return NextResponse.json(await response.json());
+
+    // Mock data for testing - replace with actual backend server call
     const mockApplications = [
       {
         _id: '1',

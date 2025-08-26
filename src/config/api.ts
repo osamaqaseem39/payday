@@ -64,6 +64,9 @@ export const getDashboardApiUrl = (endpoint: string, params?: Record<string, str
   return url;
 };
 
+// Backward compatibility - alias for getDashboardApiUrl
+export const getApiUrl = getDashboardApiUrl;
+
 // Helper function to get full API URL for website endpoints
 export const getWebsiteApiUrl = (endpoint: string): string => {
   return `${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}${endpoint}`;

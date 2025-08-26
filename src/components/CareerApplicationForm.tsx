@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { FaPaperPlane, FaSpinner, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 import FileUpload from './FileUpload';
-import { getApiUrl } from '@/config/api';
+import { getDashboardApiUrl } from '@/config/api';
 
 interface FormData {
   firstName: string;
@@ -67,7 +67,7 @@ export default function CareerApplicationForm() {
         resumeName: formData.resume?.name || ''
       };
 
-      const response = await fetch(getApiUrl('/api/career-applications/submit'), {
+      const response = await fetch(getDashboardApiUrl('/api/career-applications/submit'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

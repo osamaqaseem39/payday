@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { FaEye, FaTrash, FaEdit, FaSearch, FaFilter, FaDownload } from 'react-icons/fa';
-import { getApiUrl, getAuthHeaders } from '@/config/api';
+import { getDashboardApiUrl, getAuthHeaders } from '@/config/api';
 
 interface CareerApplication {
   _id: string;
@@ -65,7 +65,7 @@ export default function CareerApplicationsPage() {
       });
 
       // Use dashboard server instead of Next.js API
-      const response = await fetch(`${getApiUrl('/api/career-applications')}?${params}`, {
+      const response = await fetch(`${getDashboardApiUrl('/api/career-applications')}?${params}`, {
         credentials: 'include',
         headers: getAuthHeaders()
       });
@@ -86,7 +86,7 @@ export default function CareerApplicationsPage() {
 
   const handleStatusUpdate = async (applicationId: string, status: string, notes?: string) => {
     try {
-      const response = await fetch(`${getApiUrl(`/api/career-applications/${applicationId}/status`)}`, {
+      const response = await fetch(`${getDashboardApiUrl(`/api/career-applications/${applicationId}/status`)}`, {
         method: 'PATCH',
         headers: getAuthHeaders(),
         credentials: 'include',
@@ -108,7 +108,7 @@ export default function CareerApplicationsPage() {
     if (!confirm('Are you sure you want to delete this application?')) return;
 
     try {
-      const response = await fetch(`${getApiUrl(`/api/career-applications/${applicationId}`)}`, {
+      const response = await fetch(`${getDashboardApiUrl(`/api/career-applications/${applicationId}`)}`, {
         method: 'DELETE',
         headers: getAuthHeaders(),
         credentials: 'include',

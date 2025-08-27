@@ -4,10 +4,41 @@ import { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CareerApplicationForm from '@/components/CareerApplicationForm';
-import { FaBriefcase, FaUsers, FaHeart, FaRocket, FaGraduationCap, FaHandshake, FaLightbulb, FaGlobe, FaCheckCircle, FaStar, FaMapMarkerAlt, FaClock } from 'react-icons/fa';
+import { FaBriefcase, FaUsers, FaHeart, FaRocket, FaGraduationCap, FaHandshake, FaLightbulb, FaGlobe, FaCheckCircle, FaStar, FaMapMarkerAlt, FaClock, FaSpinner } from 'react-icons/fa';
+import { dashboardApi } from '@/config/api';
+
+// Job interface based on the server model
+interface Job {
+  _id: string;
+  title: string;
+  description: string;
+  requirements: string[];
+  responsibilities: string[];
+  department: string;
+  location: string;
+  employmentType: 'full-time' | 'part-time' | 'contract' | 'internship' | 'freelance';
+  experienceLevel: 'entry' | 'mid' | 'senior' | 'expert';
+  salary: {
+    min: number;
+    max: number;
+    currency: string;
+  };
+  benefits: string[];
+  status: 'draft' | 'published' | 'closed' | 'archived';
+  applicationDeadline: string;
+  numberOfPositions: number;
+  tags: string[];
+  isRemote: boolean;
+  isUrgent: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function CareerPage() {
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,6 +50,62 @@ export default function CareerPage() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const jobsData = await dashboardApi.jobs.list();
+        setJobs(jobsData || []);
+      } catch (err) {
+        console.error('Error fetching jobs:', err);
+        setError('Failed to load job listings. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, []);
+
+  // Helper function to format date
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = date.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 0) return 'Closed';
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Tomorrow';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
+    return `${Math.ceil(diffDays / 30)} months ago`;
+  };
+
+  // Helper function to get employment type color
+  const getEmploymentTypeColor = (type: string) => {
+    const colors = {
+      'full-time': 'bg-green-100 text-green-800',
+      'part-time': 'bg-blue-100 text-blue-800',
+      'contract': 'bg-purple-100 text-purple-800',
+      'internship': 'bg-orange-100 text-orange-800',
+      'freelance': 'bg-pink-100 text-pink-800'
+    };
+    return colors[type as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+  };
+
+  // Helper function to get experience level color
+  const getExperienceLevelColor = (level: string) => {
+    const colors = {
+      'entry': 'bg-green-100 text-green-800',
+      'mid': 'bg-blue-100 text-blue-800',
+      'senior': 'bg-purple-100 text-purple-800',
+      'expert': 'bg-red-100 text-red-800'
+    };
+    return colors[level as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 pt-16">
@@ -214,143 +301,119 @@ export default function CareerPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Senior Software Engineer */}
-            <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-gray-900">Senior Software Engineer</h3>
-                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">Full-time</span>
+          {/* Loading State */}
+          {loading && (
+            <div className="flex justify-center items-center py-20">
+              <div className="flex items-center space-x-3">
+                <FaSpinner className="animate-spin text-4xl text-blue-600" />
+                <span className="text-xl text-gray-600">Loading job listings...</span>
               </div>
-              <div className="space-y-4 mb-6">
-                <div className="flex items-center text-sm text-gray-600">
-                  <FaMapMarkerAlt className="mr-2" />
-                  <span>Remote (Canada)</span>
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <FaClock className="mr-2" />
-                  <span>Posted 2 days ago</span>
-                </div>
-              </div>
-              <p className="text-gray-700 mb-6">
-                Build scalable, secure applications that help Canadians access better financial services. 
-                Work with modern technologies and shape our platform's future.
-              </p>
-              <div className="flex flex-wrap gap-2 mb-6">
-                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">React</span>
-                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">Node.js</span>
-                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">TypeScript</span>
-                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">AWS</span>
-              </div>
-                          <button 
-              onClick={() => document.getElementById('application-form')?.scrollIntoView({ behavior: 'smooth' })}
-              className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-            >
-              Apply Now
-            </button>
             </div>
+          )}
 
-            {/* Product Manager */}
-            <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-gray-900">Product Manager</h3>
-                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">Full-time</span>
+          {/* Error State */}
+          {error && (
+            <div className="text-center py-20">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-8 max-w-2xl mx-auto">
+                <h3 className="text-xl font-semibold text-red-800 mb-4">Unable to Load Jobs</h3>
+                <p className="text-red-600 mb-6">{error}</p>
+                <button 
+                  onClick={() => window.location.reload()}
+                  className="bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors"
+                >
+                  Try Again
+                </button>
               </div>
-              <div className="space-y-4 mb-6">
-                <div className="flex items-center text-sm text-gray-600">
-                  <FaMapMarkerAlt className="mr-2" />
-                  <span>Toronto, ON</span>
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <FaClock className="mr-2" />
-                  <span>Posted 1 week ago</span>
-                </div>
-              </div>
-              <p className="text-gray-700 mb-6">
-                Lead product strategy and development for our lending platform. 
-                Work closely with customers, engineering, and design teams to deliver exceptional experiences.
-              </p>
-              <div className="flex flex-wrap gap-2 mb-6">
-                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">Product Strategy</span>
-                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">User Research</span>
-                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">Agile</span>
-                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">Fintech</span>
-              </div>
-                          <button 
-              onClick={() => document.getElementById('application-form')?.scrollIntoView({ behavior: 'smooth' })}
-              className="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition-colors"
-            >
-              Apply Now
-            </button>
             </div>
+          )}
 
-            {/* Customer Success Manager */}
-            <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-gray-900">Customer Success Manager</h3>
-                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">Full-time</span>
-              </div>
-              <div className="space-y-4 mb-6">
-                <div className="flex items-center text-sm text-gray-600">
-                  <FaMapMarkerAlt className="mr-2" />
-                  <span>Vancouver, BC</span>
+          {/* Jobs Grid */}
+          {!loading && !error && (
+            <>
+              {jobs.length === 0 ? (
+                <div className="text-center py-20">
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 max-w-2xl mx-auto">
+                    <FaBriefcase className="text-6xl text-gray-400 mx-auto mb-6" />
+                    <h3 className="text-xl font-semibold text-gray-800 mb-4">No Open Positions</h3>
+                    <p className="text-gray-600 mb-6">
+                      We don't have any open positions at the moment, but we're always looking for talented people to join our team.
+                    </p>
+                    <p className="text-gray-600">
+                      Feel free to submit a general application below, and we'll keep your information on file for future opportunities.
+                    </p>
+                  </div>
                 </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <FaClock className="mr-2" />
-                  <span>Posted 3 days ago</span>
+              ) : (
+                <div className="grid md:grid-cols-2 gap-8">
+                  {jobs.map((job) => (
+                    <div key={job._id} className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-xl font-bold text-gray-900">{job.title}</h3>
+                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getEmploymentTypeColor(job.employmentType)}`}>
+                          {job.employmentType.replace('-', ' ')}
+                        </span>
+                      </div>
+                      
+                      <div className="space-y-4 mb-6">
+                        <div className="flex items-center text-sm text-gray-600">
+                          <FaMapMarkerAlt className="mr-2" />
+                          <span>{job.isRemote ? 'Remote' : job.location}</span>
+                        </div>
+                        <div className="flex items-center text-sm text-gray-600">
+                          <FaClock className="mr-2" />
+                          <span>Posted {formatDate(job.createdAt)}</span>
+                        </div>
+                        <div className="flex items-center text-sm text-gray-600">
+                          <FaBriefcase className="mr-2" />
+                          <span>{job.department}</span>
+                        </div>
+                        {job.salary && (
+                          <div className="flex items-center text-sm text-gray-600">
+                            <FaStar className="mr-2" />
+                            <span>
+                              {job.salary.currency} {job.salary.min.toLocaleString()} - {job.salary.max.toLocaleString()}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <p className="text-gray-700 mb-6 line-clamp-3">
+                        {job.description}
+                      </p>
+                      
+                      <div className="flex flex-wrap gap-2 mb-6">
+                        <span className={`px-3 py-1 rounded-full text-sm ${getExperienceLevelColor(job.experienceLevel)}`}>
+                          {job.experienceLevel}
+                        </span>
+                        {job.isRemote && (
+                          <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                            Remote
+                          </span>
+                        )}
+                        {job.isUrgent && (
+                          <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm">
+                            Urgent
+                          </span>
+                        )}
+                        {job.tags.slice(0, 3).map((tag, index) => (
+                          <span key={index} className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                      
+                      <button 
+                        onClick={() => document.getElementById('application-form')?.scrollIntoView({ behavior: 'smooth' })}
+                        className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                      >
+                        Apply Now
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              </div>
-              <p className="text-gray-700 mb-6">
-                Help our customers achieve their financial goals. Build relationships, provide support, 
-                and ensure exceptional experiences throughout their journey.
-              </p>
-              <div className="flex flex-wrap gap-2 mb-6">
-                <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">Customer Support</span>
-                <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">Relationship Building</span>
-                <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">Problem Solving</span>
-                <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">Financial Services</span>
-              </div>
-                          <button 
-              onClick={() => document.getElementById('application-form')?.scrollIntoView({ behavior: 'smooth' })}
-              className="w-full bg-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
-            >
-              Apply Now
-            </button>
-            </div>
-
-            {/* Data Analyst */}
-            <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-300">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-gray-900">Data Analyst</h3>
-                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">Full-time</span>
-              </div>
-              <div className="space-y-4 mb-6">
-                <div className="flex items-center text-sm text-gray-600">
-                  <FaMapMarkerAlt className="mr-2" />
-                  <span>Remote (Canada)</span>
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <FaClock className="mr-2" />
-                  <span>Posted 5 days ago</span>
-                </div>
-              </div>
-              <p className="text-gray-700 mb-6">
-                Analyze customer data, market trends, and business metrics to drive strategic decisions. 
-                Help us understand and serve our customers better.
-              </p>
-              <div className="flex flex-wrap gap-2 mb-6">
-                <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm">SQL</span>
-                <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm">Python</span>
-                <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm">Tableau</span>
-                <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm">Statistics</span>
-              </div>
-                          <button 
-              onClick={() => document.getElementById('application-form')?.scrollIntoView({ behavior: 'smooth' })}
-              className="w-full bg-orange-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-orange-700 transition-colors"
-            >
-              Apply Now
-            </button>
-            </div>
-          </div>
+              )}
+            </>
+          )}
         </div>
       </section>
 

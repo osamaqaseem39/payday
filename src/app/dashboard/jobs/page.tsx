@@ -329,82 +329,118 @@ export default function JobsPage() {
               </select>
             </div>
 
-            {/* Jobs Grid */}
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
-              {filteredJobs.map((job) => (
-                <div key={job._id} className="bg-white shadow rounded-lg p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">{job.title}</h3>
-                      <p className="text-sm text-gray-600 mb-2">{job.department}</p>
-                      <div className="flex items-center space-x-2 mb-3">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(job.status)}`}>
-                          {job.status}
-                        </span>
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTypeColor(job.employmentType)}`}>
-                          {job.employmentType}
-                        </span>
-                        {job.isRemote && (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                            Remote
+            {/* Jobs List */}
+            <div className="bg-white shadow overflow-hidden sm:rounded-md">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Job Details
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Location & Type
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Salary & Positions
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredJobs.map((job) => (
+                      <tr key={job._id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4">
+                          <div className="flex-1">
+                            <h3 className="text-sm font-medium text-gray-900">{job.title}</h3>
+                            <p className="text-sm text-gray-600">{job.department}</p>
+                            <div className="flex items-center space-x-2 mt-2">
+                              {job.isRemote && (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                  Remote
+                                </span>
+                              )}
+                              {job.isUrgent && (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                  Urgent
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-gray-900">{job.location}</div>
+                          <div className="text-sm text-gray-600">{job.employmentType}</div>
+                          <div className="text-sm text-gray-600">{job.experienceLevel}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-gray-900">
+                            {job.salary?.currency} {job.salary?.min?.toLocaleString()} - {job.salary?.max?.toLocaleString()}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {job.numberOfPositions} position{job.numberOfPositions > 1 ? 's' : ''} available
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(job.status)}`}>
+                            {job.status}
                           </span>
-                        )}
-                        {job.isUrgent && (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                            Urgent
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-600 mb-2">{job.location}</p>
-                      <p className="text-sm text-gray-600 mb-2">
-                        {job.salary?.currency} {job.salary?.min?.toLocaleString()} - {job.salary?.max?.toLocaleString()}
-                      </p>
-                      <p className="text-sm text-gray-600 mb-4">
-                        {job.numberOfPositions} position{job.numberOfPositions > 1 ? 's' : ''} available
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => handleEdit(job)}
-                        className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                      >
-                        <HiPencil className="h-4 w-4 mr-1" />
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteJob(job._id)}
-                        className="inline-flex items-center px-3 py-1 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                      >
-                        <HiTrash className="h-4 w-4 mr-1" />
-                        Delete
-                      </button>
-                    </div>
-                    <div className="flex space-x-2">
-                      {job.status === 'draft' && (
-                        <button
-                          onClick={() => handlePublishJob(job._id)}
-                          className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                        >
-                          <HiCheckCircle className="h-4 w-4 mr-1" />
-                          Publish
-                        </button>
-                      )}
-                      {job.status === 'published' && (
-                        <button
-                          onClick={() => handleCloseJob(job._id)}
-                          className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                        >
-                          <HiXCircle className="h-4 w-4 mr-1" />
-                          Close
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
+                          <div className="mt-1">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTypeColor(job.employmentType)}`}>
+                              {job.employmentType}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex flex-col space-y-2">
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => handleEdit(job)}
+                                className="inline-flex items-center px-2 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                              >
+                                <HiPencil className="h-3 w-3 mr-1" />
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleDeleteJob(job._id)}
+                                className="inline-flex items-center px-2 py-1 border border-red-300 shadow-sm text-xs font-medium rounded text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                              >
+                                <HiTrash className="h-3 w-3 mr-1" />
+                                Delete
+                              </button>
+                            </div>
+                            <div className="flex space-x-2">
+                              {job.status === 'draft' && (
+                                <button
+                                  onClick={() => handlePublishJob(job._id)}
+                                  className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                                >
+                                  <HiCheckCircle className="h-3 w-3 mr-1" />
+                                  Publish
+                                </button>
+                              )}
+                              {job.status === 'published' && (
+                                <button
+                                  onClick={() => handleCloseJob(job._id)}
+                                  className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                >
+                                  <HiXCircle className="h-3 w-3 mr-1" />
+                                  Close
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             {filteredJobs.length === 0 && (

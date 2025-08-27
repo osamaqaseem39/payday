@@ -8,7 +8,7 @@ interface User {
   _id: string;
   email: string;
   name: string;
-  role: 'admin' | 'hr' | 'manager' | 'user';
+  role: 'admin' | 'user' | 'manager';
 }
 
 interface AuthContextType {

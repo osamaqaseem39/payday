@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { HiPlus, HiPencil, HiTrash, HiEye, HiCheckCircle, HiXCircle } from 'react-icons/hi';
+import { HiPlus, HiPencil, HiTrash, HiEye, HiCheckCircle, HiXCircle, HiX } from 'react-icons/hi';
 import { dashboardApi } from '../../../config/api';
 
 interface Job {
@@ -39,6 +39,28 @@ export default function JobsPage() {
   const [editingJob, setEditingJob] = useState<Job | null>(null);
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [formData, setFormData] = useState({
+    title: '',
+    department: '',
+    location: '',
+    employmentType: 'full-time',
+    experienceLevel: 'entry',
+    salary: {
+      min: 0,
+      max: 0,
+      currency: 'USD'
+    },
+    description: '',
+    applicationDeadline: '',
+    status: 'draft',
+    isRemote: false,
+    isUrgent: false,
+    numberOfPositions: 1,
+    requirements: [''],
+    responsibilities: [''],
+    benefits: [''],
+    tags: ['']
+  });
 
   useEffect(() => {
     fetchJobs();
@@ -66,6 +88,7 @@ export default function JobsPage() {
       await dashboardApi.jobs.create(jobData);
       await fetchJobs();
       setShowModal(false);
+      resetForm();
     } catch (error) {
       console.error('Error creating job:', error);
     }
@@ -77,6 +100,7 @@ export default function JobsPage() {
       await fetchJobs();
       setShowModal(false);
       setEditingJob(null);
+      resetForm();
     } catch (error) {
       console.error('Error updating job:', error);
     }
@@ -109,6 +133,96 @@ export default function JobsPage() {
     } catch (error) {
       console.error('Error closing job:', error);
     }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      department: '',
+      location: '',
+      employmentType: 'full-time',
+      experienceLevel: 'entry',
+      salary: {
+        min: 0,
+        max: 0,
+        currency: 'USD'
+      },
+      description: '',
+      applicationDeadline: '',
+      status: 'draft',
+      isRemote: false,
+      isUrgent: false,
+      numberOfPositions: 1,
+      requirements: [''],
+      responsibilities: [''],
+      benefits: [''],
+      tags: ['']
+    });
+  };
+
+  const handleEdit = (job: Job) => {
+    setEditingJob(job);
+    setFormData({
+      title: job.title,
+      department: job.department,
+      location: job.location,
+      employmentType: job.employmentType,
+      experienceLevel: job.experienceLevel,
+      salary: job.salary,
+      description: job.description,
+      applicationDeadline: job.applicationDeadline,
+      status: job.status,
+      isRemote: job.isRemote,
+      isUrgent: job.isUrgent,
+      numberOfPositions: job.numberOfPositions,
+      requirements: job.requirements.length > 0 ? job.requirements : [''],
+      responsibilities: job.responsibilities.length > 0 ? job.responsibilities : [''],
+      benefits: job.benefits.length > 0 ? job.benefits : [''],
+      tags: job.tags.length > 0 ? job.tags : ['']
+    });
+    setShowModal(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Filter out empty strings from arrays
+    const cleanFormData = {
+      ...formData,
+      requirements: formData.requirements.filter(req => req.trim() !== ''),
+      responsibilities: formData.responsibilities.filter(resp => resp.trim() !== ''),
+      benefits: formData.benefits.filter(benefit => benefit.trim() !== ''),
+      tags: formData.tags.filter(tag => tag.trim() !== '')
+    };
+
+    if (editingJob) {
+      await handleUpdateJob(editingJob._id, cleanFormData);
+    } else {
+      await handleCreateJob(cleanFormData);
+    }
+  };
+
+  const addArrayItem = (field: 'requirements' | 'responsibilities' | 'benefits' | 'tags') => {
+    setFormData({
+      ...formData,
+      [field]: [...formData[field], '']
+    });
+  };
+
+  const removeArrayItem = (field: 'requirements' | 'responsibilities' | 'benefits' | 'tags', index: number) => {
+    setFormData({
+      ...formData,
+      [field]: formData[field].filter((_, i) => i !== index)
+    });
+  };
+
+  const updateArrayItem = (field: 'requirements' | 'responsibilities' | 'benefits' | 'tags', index: number, value: string) => {
+    const newArray = [...formData[field]];
+    newArray[index] = value;
+    setFormData({
+      ...formData,
+      [field]: newArray
+    });
   };
 
   const getStatusColor = (status: string) => {
@@ -174,7 +288,11 @@ export default function JobsPage() {
                 <p className="text-gray-600">Manage job postings and applications</p>
               </div>
               <button
-                onClick={() => setShowModal(true)}
+                onClick={() => {
+                  setEditingJob(null);
+                  resetForm();
+                  setShowModal(true);
+                }}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 <HiPlus className="h-4 w-4 mr-2" />
@@ -244,10 +362,7 @@ export default function JobsPage() {
                   <div className="flex items-center justify-between pt-4 border-t border-gray-200">
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => {
-                          setEditingJob(job);
-                          setShowModal(true);
-                        }}
+                        onClick={() => handleEdit(job)}
                         className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                       >
                         <HiPencil className="h-4 w-4 mr-1" />
@@ -292,6 +407,349 @@ export default function JobsPage() {
               </div>
             )}
           </div>
+
+          {/* Job Form Modal */}
+          {showModal && (
+            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+              <div className="relative top-10 mx-auto p-5 border w-11/12 max-w-4xl shadow-lg rounded-md bg-white">
+                <div className="mt-3">
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-lg font-medium text-gray-900">
+                      {editingJob ? 'Edit Job' : 'Create New Job'}
+                    </h3>
+                    <button
+                      onClick={() => {
+                        setShowModal(false);
+                        setEditingJob(null);
+                        resetForm();
+                      }}
+                      className="text-gray-400 hover:text-gray-600"
+                    >
+                      <HiX className="h-6 w-6" />
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Basic Information */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Job Title *</label>
+                        <input
+                          type="text"
+                          value={formData.title}
+                          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Department *</label>
+                        <input
+                          type="text"
+                          value={formData.department}
+                          onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Location *</label>
+                        <input
+                          type="text"
+                          value={formData.location}
+                          onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Employment Type *</label>
+                        <select
+                          value={formData.employmentType}
+                          onChange={(e) => setFormData({ ...formData, employmentType: e.target.value })}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        >
+                          <option value="full-time">Full-time</option>
+                          <option value="part-time">Part-time</option>
+                          <option value="contract">Contract</option>
+                          <option value="internship">Internship</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Experience Level *</label>
+                        <select
+                          value={formData.experienceLevel}
+                          onChange={(e) => setFormData({ ...formData, experienceLevel: e.target.value })}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        >
+                          <option value="entry">Entry Level</option>
+                          <option value="mid">Mid Level</option>
+                          <option value="senior">Senior Level</option>
+                          <option value="executive">Executive Level</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Number of Positions *</label>
+                        <input
+                          type="number"
+                          min="1"
+                          value={formData.numberOfPositions}
+                          onChange={(e) => setFormData({ ...formData, numberOfPositions: parseInt(e.target.value) })}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Application Deadline *</label>
+                        <input
+                          type="date"
+                          value={formData.applicationDeadline}
+                          onChange={(e) => setFormData({ ...formData, applicationDeadline: e.target.value })}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    {/* Salary Information */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Currency</label>
+                        <select
+                          value={formData.salary.currency}
+                          onChange={(e) => setFormData({ 
+                            ...formData, 
+                            salary: { ...formData.salary, currency: e.target.value }
+                          })}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        >
+                          <option value="USD">USD</option>
+                          <option value="EUR">EUR</option>
+                          <option value="GBP">GBP</option>
+                          <option value="CAD">CAD</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Minimum Salary</label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={formData.salary.min}
+                          onChange={(e) => setFormData({ 
+                            ...formData, 
+                            salary: { ...formData.salary, min: parseInt(e.target.value) }
+                          })}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Maximum Salary</label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={formData.salary.max}
+                          onChange={(e) => setFormData({ 
+                            ...formData, 
+                            salary: { ...formData.salary, max: parseInt(e.target.value) }
+                          })}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Checkboxes */}
+                    <div className="flex space-x-6">
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={formData.isRemote}
+                          onChange={(e) => setFormData({ ...formData, isRemote: e.target.checked })}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <label className="ml-2 block text-sm text-gray-900">Remote Position</label>
+                      </div>
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={formData.isUrgent}
+                          onChange={(e) => setFormData({ ...formData, isUrgent: e.target.checked })}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <label className="ml-2 block text-sm text-gray-900">Urgent Hiring</label>
+                      </div>
+                    </div>
+
+                    {/* Job Description */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Job Description *</label>
+                      <textarea
+                        rows={4}
+                        value={formData.description}
+                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        required
+                      />
+                    </div>
+
+                    {/* Requirements */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Requirements</label>
+                      {formData.requirements.map((req, index) => (
+                        <div key={index} className="flex space-x-2 mt-2">
+                          <input
+                            type="text"
+                            value={req}
+                            onChange={(e) => updateArrayItem('requirements', index, e.target.value)}
+                            className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                            placeholder="Enter requirement"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeArrayItem('requirements', index)}
+                            className="px-3 py-2 text-red-600 hover:text-red-800"
+                          >
+                            <HiX className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => addArrayItem('requirements')}
+                        className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+                      >
+                        + Add Requirement
+                      </button>
+                    </div>
+
+                    {/* Responsibilities */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Responsibilities</label>
+                      {formData.responsibilities.map((resp, index) => (
+                        <div key={index} className="flex space-x-2 mt-2">
+                          <input
+                            type="text"
+                            value={resp}
+                            onChange={(e) => updateArrayItem('responsibilities', index, e.target.value)}
+                            className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                            placeholder="Enter responsibility"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeArrayItem('responsibilities', index)}
+                            className="px-3 py-2 text-red-600 hover:text-red-800"
+                          >
+                            <HiX className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => addArrayItem('responsibilities')}
+                        className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+                      >
+                        + Add Responsibility
+                      </button>
+                    </div>
+
+                    {/* Benefits */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Benefits</label>
+                      {formData.benefits.map((benefit, index) => (
+                        <div key={index} className="flex space-x-2 mt-2">
+                          <input
+                            type="text"
+                            value={benefit}
+                            onChange={(e) => updateArrayItem('benefits', index, e.target.value)}
+                            className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                            placeholder="Enter benefit"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeArrayItem('benefits', index)}
+                            className="px-3 py-2 text-red-600 hover:text-red-800"
+                          >
+                            <HiX className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => addArrayItem('benefits')}
+                        className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+                      >
+                        + Add Benefit
+                      </button>
+                    </div>
+
+                    {/* Tags */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Tags</label>
+                      {formData.tags.map((tag, index) => (
+                        <div key={index} className="flex space-x-2 mt-2">
+                          <input
+                            type="text"
+                            value={tag}
+                            onChange={(e) => updateArrayItem('tags', index, e.target.value)}
+                            className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                            placeholder="Enter tag"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeArrayItem('tags', index)}
+                            className="px-3 py-2 text-red-600 hover:text-red-800"
+                          >
+                            <HiX className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => addArrayItem('tags')}
+                        className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+                      >
+                        + Add Tag
+                      </button>
+                    </div>
+
+                    {/* Status */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Status</label>
+                      <select
+                        value={formData.status}
+                        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                      >
+                        <option value="draft">Draft</option>
+                        <option value="active">Active</option>
+                        <option value="closed">Closed</option>
+                      </select>
+                    </div>
+
+                    {/* Form Actions */}
+                    <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowModal(false);
+                          setEditingJob(null);
+                          resetForm();
+                        }}
+                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700"
+                      >
+                        {editingJob ? 'Update Job' : 'Create Job'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </DashboardLayout>
     </ProtectedRoute>

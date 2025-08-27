@@ -227,12 +227,14 @@ export default function JobsPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active':
+      case 'published':
         return 'bg-green-100 text-green-800';
       case 'closed':
         return 'bg-red-100 text-red-800';
       case 'draft':
         return 'bg-gray-100 text-gray-800';
+      case 'archived':
+        return 'bg-yellow-100 text-yellow-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -320,9 +322,10 @@ export default function JobsPage() {
                 className="block w-full sm:w-48 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               >
                 <option value="all">All Jobs</option>
-                <option value="active">Active</option>
+                <option value="published">Published</option>
                 <option value="draft">Draft</option>
                 <option value="closed">Closed</option>
+                <option value="archived">Archived</option>
               </select>
             </div>
 
@@ -389,7 +392,7 @@ export default function JobsPage() {
                           Publish
                         </button>
                       )}
-                      {job.status === 'active' && (
+                      {job.status === 'published' && (
                         <button
                           onClick={() => handleCloseJob(job._id)}
                           className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
@@ -441,7 +444,7 @@ export default function JobsPage() {
                           type="text"
                           value={formData.title}
                           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm h-10"
                           required
                         />
                       </div>
@@ -451,7 +454,7 @@ export default function JobsPage() {
                           type="text"
                           value={formData.department}
                           onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm h-10"
                           required
                         />
                       </div>
@@ -461,7 +464,7 @@ export default function JobsPage() {
                           type="text"
                           value={formData.location}
                           onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm h-10"
                           required
                         />
                       </div>
@@ -476,6 +479,7 @@ export default function JobsPage() {
                           <option value="part-time">Part-time</option>
                           <option value="contract">Contract</option>
                           <option value="internship">Internship</option>
+                          <option value="freelance">Freelance</option>
                         </select>
                       </div>
                       <div>
@@ -488,7 +492,7 @@ export default function JobsPage() {
                           <option value="entry">Entry Level</option>
                           <option value="mid">Mid Level</option>
                           <option value="senior">Senior Level</option>
-                          <option value="executive">Executive Level</option>
+                          <option value="expert">Expert Level</option>
                         </select>
                       </div>
                       <div>
@@ -498,7 +502,7 @@ export default function JobsPage() {
                           min="1"
                           value={formData.numberOfPositions}
                           onChange={(e) => setFormData({ ...formData, numberOfPositions: parseInt(e.target.value) })}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm h-10"
                           required
                         />
                       </div>
@@ -508,7 +512,7 @@ export default function JobsPage() {
                           type="date"
                           value={formData.applicationDeadline}
                           onChange={(e) => setFormData({ ...formData, applicationDeadline: e.target.value })}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm h-10"
                           required
                         />
                       </div>
@@ -542,7 +546,7 @@ export default function JobsPage() {
                             ...formData, 
                             salary: { ...formData.salary, min: parseInt(e.target.value) }
                           })}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm h-10"
                         />
                       </div>
                       <div>
@@ -555,7 +559,7 @@ export default function JobsPage() {
                             ...formData, 
                             salary: { ...formData.salary, max: parseInt(e.target.value) }
                           })}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm h-10"
                         />
                       </div>
                     </div>
@@ -586,7 +590,7 @@ export default function JobsPage() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Job Description *</label>
                       <textarea
-                        rows={4}
+                        rows={8}
                         value={formData.description}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
@@ -603,7 +607,7 @@ export default function JobsPage() {
                             type="text"
                             value={req}
                             onChange={(e) => updateArrayItem('requirements', index, e.target.value)}
-                            className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                            className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm h-10"
                             placeholder="Enter requirement"
                           />
                           <button
@@ -633,7 +637,7 @@ export default function JobsPage() {
                             type="text"
                             value={resp}
                             onChange={(e) => updateArrayItem('responsibilities', index, e.target.value)}
-                            className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                            className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm h-10"
                             placeholder="Enter responsibility"
                           />
                           <button
@@ -663,7 +667,7 @@ export default function JobsPage() {
                             type="text"
                             value={benefit}
                             onChange={(e) => updateArrayItem('benefits', index, e.target.value)}
-                            className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                            className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm h-10"
                             placeholder="Enter benefit"
                           />
                           <button
@@ -693,7 +697,7 @@ export default function JobsPage() {
                             type="text"
                             value={tag}
                             onChange={(e) => updateArrayItem('tags', index, e.target.value)}
-                            className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                            className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm h-10"
                             placeholder="Enter tag"
                           />
                           <button
@@ -723,8 +727,9 @@ export default function JobsPage() {
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                       >
                         <option value="draft">Draft</option>
-                        <option value="active">Active</option>
+                        <option value="published">Published</option>
                         <option value="closed">Closed</option>
+                        <option value="archived">Archived</option>
                       </select>
                     </div>
 

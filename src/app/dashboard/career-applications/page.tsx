@@ -5,6 +5,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { HiEye, HiTrash, HiSearch, HiMail, HiPhone, HiCalendar, HiDocumentText, HiDownload } from 'react-icons/hi';
 import { dashboardApi } from '@/config/api';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface CareerApplication {
   _id: string;
@@ -59,6 +60,7 @@ interface InterviewCandidate {
 }
 
 export default function CareerApplicationsPage() {
+  const { user } = useAuth();
   const [applications, setApplications] = useState<CareerApplication[]>([]);
   const [interviewCandidates, setInterviewCandidates] = useState<InterviewCandidate[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,9 +72,18 @@ export default function CareerApplicationsPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [positionFilter, setPositionFilter] = useState('all');
 
+  // Check if user has admin or manager access
   useEffect(() => {
-    fetchApplications();
-  }, []);
+    if (user && (user.role !== 'admin' && user.role !== 'manager')) {
+      console.log('🚫 User does not have required access. Role:', user.role);
+      window.location.href = '/dashboard';
+      return;
+    }
+    
+    if (user && (user.role === 'admin' || user.role === 'manager')) {
+      fetchApplications();
+    }
+  }, [user]);
 
   const fetchApplications = async () => {
     try {
@@ -216,30 +227,6 @@ export default function CareerApplicationsPage() {
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
               <p className="mt-4 text-gray-600">Loading applications and candidates...</p>
-            </div>
-          </div>
-        </DashboardLayout>
-      </ProtectedRoute>
-    );
-  }
-
-  // Check if user is authenticated
-  const token = localStorage.getItem('authToken');
-  if (!token) {
-    return (
-      <ProtectedRoute requiredRole="manager">
-        <DashboardLayout>
-          <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-red-600 text-6xl mb-4">🔐</div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Authentication Required</h2>
-              <p className="text-gray-600 mb-6">Please log in to view career applications.</p>
-              <a 
-                href="/login" 
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-              >
-                Go to Login
-              </a>
             </div>
           </div>
         </DashboardLayout>

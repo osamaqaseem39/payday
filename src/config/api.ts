@@ -103,10 +103,25 @@ export const getWebsiteApiUrl = (endpoint: string): string => {
 // Helper function to get auth headers
 export const getAuthHeaders = (): Record<string, string> => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
-  return {
+  
+  // Debug logging
+  if (typeof window !== 'undefined') {
+    console.log('🔐 Getting auth headers, token present:', !!token);
+    if (token) {
+      console.log('🔐 Token length:', token.length);
+      console.log('🔐 Token preview:', token.substring(0, 20) + '...');
+    }
+  }
+  
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` }),
   };
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  
+  return headers;
 };
 
 // Helper function to handle API responses

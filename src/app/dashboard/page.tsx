@@ -15,8 +15,7 @@ import {
 } from 'react-icons/hi';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import ProtectedRoute from '../../components/ProtectedRoute';
-
-const API_BASE_URL = 'https://payday-server.vercel.app/api';
+import { dashboardApi } from '../../config/api';
 
 interface Stat {
   name: string;
@@ -133,25 +132,21 @@ export default function DashboardPage() {
     const fetchDashboardData = async () => {
       try {
         // Fetch applications count
-        const applicationsResponse = await fetch(`${API_BASE_URL}/applications`);
-        const applicationsData = await applicationsResponse.json();
+        const applicationsData = await dashboardApi.applications.list();
         const applicationsCount = Array.isArray(applicationsData) ? applicationsData.length : 0;
 
         // Fetch jobs count
-        const jobsResponse = await fetch(`${API_BASE_URL}/jobs`);
-        const jobsData = await jobsResponse.json();
+        const jobsData = await dashboardApi.jobs.list();
         const activeJobsCount = Array.isArray(jobsData) ? jobsData.filter((job: any) => job.status === 'active').length : 0;
 
         // Fetch candidates count
-        const candidatesResponse = await fetch(`${API_BASE_URL}/candidates`);
-        const candidatesData = await candidatesResponse.json();
+        const candidatesData = await dashboardApi.interviewCandidates.list();
         const candidatesCount = Array.isArray(candidatesData) ? candidatesData.length : 0;
 
         // Fetch interviews count for this week
-        const interviewsResponse = await fetch(`${API_BASE_URL}/interviews`);
-        const interviewsData = await interviewsResponse.json();
-        const thisWeekInterviews = Array.isArray(interviewsData) ? interviewsData.filter((interview: any) => {
-          const interviewDate = new Date(interview.date);
+        const upcomingInterviewsData = await dashboardApi.interviewCandidates.getUpcomingInterviews();
+        const thisWeekInterviews = Array.isArray(upcomingInterviewsData) ? upcomingInterviewsData.filter((interview: any) => {
+          const interviewDate = new Date(interview.scheduledDate || interview.date);
           const now = new Date();
           const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
           return interviewDate >= weekAgo && interviewDate <= now;
@@ -169,11 +164,11 @@ export default function DashboardPage() {
         if (Array.isArray(applicationsData)) {
           const recent = applicationsData.slice(0, 5).map((app: any, index: number) => ({
             id: index + 1,
-            name: app.candidateId?.name || 'Unknown',
-            position: app.jobId?.title || 'Unknown Position',
+            name: app.candidateName || app.candidateId?.name || 'Unknown',
+            position: app.jobTitle || app.jobId?.title || 'Unknown Position',
             status: app.status || 'pending',
             date: 'Recently',
-            avatar: (app.candidateId?.name || 'U').charAt(0).toUpperCase()
+            avatar: (app.candidateName || app.candidateId?.name || 'U').charAt(0).toUpperCase()
           }));
           setRecentApplications(recent);
         }

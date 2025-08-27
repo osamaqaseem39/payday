@@ -1,23 +1,32 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { HiPlus, HiPencil, HiTrash, HiEye } from 'react-icons/hi';
-
-const API_BASE_URL = 'https://payday-server.vercel.app/api';
+import { HiPlus, HiPencil, HiTrash, HiEye, HiCheckCircle, HiXCircle } from 'react-icons/hi';
+import { dashboardApi } from '../../../config/api';
 
 interface Job {
   _id: string;
   title: string;
   department: string;
   location: string;
-  type: string;
-  experience: string;
-  salary: string;
+  employmentType: string;
+  experienceLevel: string;
+  salary: {
+    min: number;
+    max: number;
+    currency: string;
+  };
   description: string;
-  deadline: string;
+  applicationDeadline: string;
   status: string;
-  postedDate: string;
-  applicationsCount: number;
+  createdAt: string;
+  isRemote: boolean;
+  isUrgent: boolean;
+  numberOfPositions: number;
+  requirements: string[];
+  responsibilities: string[];
+  benefits: string[];
+  tags: string[];
 }
 
 import DashboardLayout from '../../../components/DashboardLayout';
@@ -28,6 +37,8 @@ export default function JobsPage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
+  const [filter, setFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchJobs();
@@ -35,12 +46,7 @@ export default function JobsPage() {
 
   const fetchJobs = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/jobs`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      // Ensure data is an array
+      const data = await dashboardApi.jobs.list();
       if (Array.isArray(data)) {
         setJobs(data);
       } else {
@@ -49,10 +55,59 @@ export default function JobsPage() {
       }
     } catch (error) {
       console.error('Error fetching jobs:', error);
-      // Error occurred, set empty array
       setJobs([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCreateJob = async (jobData: Partial<Job>) => {
+    try {
+      await dashboardApi.jobs.create(jobData);
+      await fetchJobs();
+      setShowModal(false);
+    } catch (error) {
+      console.error('Error creating job:', error);
+    }
+  };
+
+  const handleUpdateJob = async (id: string, jobData: Partial<Job>) => {
+    try {
+      await dashboardApi.jobs.update(id, jobData);
+      await fetchJobs();
+      setShowModal(false);
+      setEditingJob(null);
+    } catch (error) {
+      console.error('Error updating job:', error);
+    }
+  };
+
+  const handleDeleteJob = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this job?')) {
+      try {
+        await dashboardApi.jobs.delete(id);
+        await fetchJobs();
+      } catch (error) {
+        console.error('Error deleting job:', error);
+      }
+    }
+  };
+
+  const handlePublishJob = async (id: string) => {
+    try {
+      await dashboardApi.jobs.publish(id);
+      await fetchJobs();
+    } catch (error) {
+      console.error('Error publishing job:', error);
+    }
+  };
+
+  const handleCloseJob = async (id: string) => {
+    try {
+      await dashboardApi.jobs.close(id);
+      await fetchJobs();
+    } catch (error) {
+      console.error('Error closing job:', error);
     }
   };
 
@@ -84,14 +139,26 @@ export default function JobsPage() {
     }
   };
 
+  const filteredJobs = jobs.filter(job => {
+    const matchesFilter = filter === 'all' || job.status === filter;
+    const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         job.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         job.location.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesFilter && matchesSearch;
+  });
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading jobs...</p>
-        </div>
-      </div>
+      <ProtectedRoute>
+        <DashboardLayout>
+          <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading jobs...</p>
+            </div>
+          </div>
+        </DashboardLayout>
+      </ProtectedRoute>
     );
   }
 
@@ -99,99 +166,133 @@ export default function JobsPage() {
     <ProtectedRoute>
       <DashboardLayout>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-        <div className="space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Jobs</h1>
-              <p className="text-gray-600">Manage job postings and applications.</p>
+          <div className="space-y-6">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Jobs Management</h1>
+                <p className="text-gray-600">Manage job postings and applications</p>
+              </div>
+              <button
+                onClick={() => setShowModal(true)}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                <HiPlus className="h-4 w-4 mr-2" />
+                Add Job
+              </button>
             </div>
-            <button
-              onClick={() => setShowModal(true)}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              <HiPlus className="h-4 w-4 mr-2" />
-              Add Job
-            </button>
-          </div>
 
-          {/* Jobs Table */}
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">All Jobs</h3>
+            {/* Filters and Search */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  placeholder="Search jobs..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                />
+              </div>
+              <select
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className="block w-full sm:w-48 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+              >
+                <option value="all">All Jobs</option>
+                <option value="active">Active</option>
+                <option value="draft">Draft</option>
+                <option value="closed">Closed</option>
+              </select>
             </div>
-            <div className="overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applications</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {jobs && jobs.length > 0 ? (
-                    jobs.map((job) => (
-                    <tr key={job._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">{job.title}</div>
-                          <div className="text-sm text-gray-500">{job.salary}</div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{job.department}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{job.location}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTypeColor(job.type)}`}>
-                          {job.type}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+
+            {/* Jobs Grid */}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
+              {filteredJobs.map((job) => (
+                <div key={job._id} className="bg-white shadow rounded-lg p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">{job.title}</h3>
+                      <p className="text-sm text-gray-600 mb-2">{job.department}</p>
+                      <div className="flex items-center space-x-2 mb-3">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(job.status)}`}>
                           {job.status}
                         </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{job.applicationsCount}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(job.deadline).toLocaleDateString()}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex space-x-2">
-                          <button className="text-blue-600 hover:text-blue-900">
-                            <HiEye className="h-4 w-4" />
-                          </button>
-                          <button 
-                            onClick={() => {
-                              setEditingJob(job);
-                              setShowModal(true);
-                            }}
-                            className="text-green-600 hover:text-green-900"
-                          >
-                            <HiPencil className="h-4 w-4" />
-                          </button>
-                          <button className="text-red-600 hover:text-red-900">
-                            <HiTrash className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                  ) : (
-                    <tr>
-                      <td colSpan={8} className="px-6 py-4 text-center text-gray-500">
-                        No jobs found
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTypeColor(job.employmentType)}`}>
+                          {job.employmentType}
+                        </span>
+                        {job.isRemote && (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                            Remote
+                          </span>
+                        )}
+                        {job.isUrgent && (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            Urgent
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">{job.location}</p>
+                      <p className="text-sm text-gray-600 mb-2">
+                        {job.salary?.currency} {job.salary?.min?.toLocaleString()} - {job.salary?.max?.toLocaleString()}
+                      </p>
+                      <p className="text-sm text-gray-600 mb-4">
+                        {job.numberOfPositions} position{job.numberOfPositions > 1 ? 's' : ''} available
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => {
+                          setEditingJob(job);
+                          setShowModal(true);
+                        }}
+                        className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      >
+                        <HiPencil className="h-4 w-4 mr-1" />
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteJob(job._id)}
+                        className="inline-flex items-center px-3 py-1 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                      >
+                        <HiTrash className="h-4 w-4 mr-1" />
+                        Delete
+                      </button>
+                    </div>
+                    <div className="flex space-x-2">
+                      {job.status === 'draft' && (
+                        <button
+                          onClick={() => handlePublishJob(job._id)}
+                          className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                        >
+                          <HiCheckCircle className="h-4 w-4 mr-1" />
+                          Publish
+                        </button>
+                      )}
+                      {job.status === 'active' && (
+                        <button
+                          onClick={() => handleCloseJob(job._id)}
+                          className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                        >
+                          <HiXCircle className="h-4 w-4 mr-1" />
+                          Close
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
+
+            {filteredJobs.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-gray-500">No jobs found matching your criteria.</p>
+              </div>
+            )}
           </div>
         </div>
-      </div>
       </DashboardLayout>
     </ProtectedRoute>
   );

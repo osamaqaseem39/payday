@@ -7,34 +7,55 @@ const API_CONFIG = {
   ENDPOINTS: {
     // Dashboard Server Endpoints
     DASHBOARD: {
-      HEALTH: '/api/health',
+      HEALTH: '/',
       AUTH: {
         LOGIN: '/api/auth/login',
         REGISTER: '/api/auth/register',
-        TEST: '/api/auth/test'
+        PROFILE: '/api/auth/profile',
+        UPDATE_PROFILE: '/api/auth/profile'
       },
       JOBS: {
         LIST: '/api/jobs',
-        PUBLIC: '/api/jobs/public',
+        SEARCH: '/api/jobs/search',
+        FILTERS: '/api/jobs/filters',
+        REMOTE: '/api/jobs/remote',
+        URGENT: '/api/jobs/urgent',
+        EXPIRING: '/api/jobs/expiring',
+        STATISTICS: '/api/jobs/statistics',
+        MY_JOBS: '/api/jobs/my-jobs',
+        BY_DEPARTMENT: '/api/jobs/department/:department',
         CREATE: '/api/jobs',
         GET_BY_ID: '/api/jobs/:id',
         UPDATE: '/api/jobs/:id',
-        DELETE: '/api/jobs/:id'
-      },
-      CAREER_APPLICATIONS: {
-        LIST: '/api/career-applications',
-        CREATE: '/api/career-applications',
-        GET_BY_ID: '/api/career-applications/:id',
-        UPDATE: '/api/career-applications/:id',
-        DELETE: '/api/career-applications/:id',
-        UPDATE_STATUS: '/api/career-applications/:id/status'
+        DELETE: '/api/jobs/:id',
+        PUBLISH: '/api/jobs/:id/publish',
+        CLOSE: '/api/jobs/:id/close'
       },
       APPLICATIONS: {
         LIST: '/api/applications',
         CREATE: '/api/applications',
         GET_BY_ID: '/api/applications/:id',
         UPDATE: '/api/applications/:id',
-        DELETE: '/api/applications/:id'
+        DELETE: '/api/applications/:id',
+        BY_STATUS: '/api/applications/status/:status',
+        RECENT: '/api/applications/recent',
+        STATISTICS: '/api/applications/statistics',
+        SEARCH: '/api/applications/search',
+        UPDATE_STATUS: '/api/applications/:id/status'
+      },
+      INTERVIEW_CANDIDATES: {
+        LIST: '/api/interview-candidates',
+        CREATE: '/api/interview-candidates',
+        GET_BY_ID: '/api/interview-candidates/:id',
+        STATISTICS: '/api/interview-candidates/statistics',
+        FOLLOW_UP: '/api/interview-candidates/follow-up',
+        UPCOMING_INTERVIEWS: '/api/interview-candidates/upcoming-interviews',
+        BY_INTERVIEWER: '/api/interview-candidates/interviewer/:interviewerId',
+        BY_STAGE: '/api/interview-candidates/stage/:stage',
+        SCHEDULE_INTERVIEW: '/api/interview-candidates/:id/schedule-interview',
+        MAKE_DECISION: '/api/interview-candidates/:id/decision',
+        ADD_COMMUNICATION: '/api/interview-candidates/:id/communication',
+        CREATE_OFFER: '/api/interview-candidates/:id/offer'
       },
       UPLOAD: {
         RESUME: '/api/upload/resume',
@@ -119,9 +140,18 @@ export const dashboardApi = {
       return handleApiResponse(response);
     },
     
-    test: async () => {
-      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.AUTH.TEST), {
+    getProfile: async () => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.AUTH.PROFILE), {
         headers: getAuthHeaders()
+      });
+      return handleApiResponse(response);
+    },
+    
+    updateProfile: async (profileData: any) => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.AUTH.UPDATE_PROFILE), {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(profileData)
       });
       return handleApiResponse(response);
     }
@@ -136,8 +166,59 @@ export const dashboardApi = {
       return handleApiResponse(response);
     },
     
-    public: async () => {
-      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.JOBS.PUBLIC));
+    search: async (query: string) => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.JOBS.SEARCH) + `?q=${encodeURIComponent(query)}`, {
+        headers: getAuthHeaders()
+      });
+      return handleApiResponse(response);
+    },
+    
+    getFilters: async () => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.JOBS.FILTERS), {
+        headers: getAuthHeaders()
+      });
+      return handleApiResponse(response);
+    },
+    
+    getRemote: async () => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.JOBS.REMOTE), {
+        headers: getAuthHeaders()
+      });
+      return handleApiResponse(response);
+    },
+    
+    getUrgent: async () => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.JOBS.URGENT), {
+        headers: getAuthHeaders()
+      });
+      return handleApiResponse(response);
+    },
+    
+    getExpiring: async () => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.JOBS.EXPIRING), {
+        headers: getAuthHeaders()
+      });
+      return handleApiResponse(response);
+    },
+    
+    getStatistics: async () => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.JOBS.STATISTICS), {
+        headers: getAuthHeaders()
+      });
+      return handleApiResponse(response);
+    },
+    
+    getMyJobs: async () => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.JOBS.MY_JOBS), {
+        headers: getAuthHeaders()
+      });
+      return handleApiResponse(response);
+    },
+    
+    getByDepartment: async (department: string) => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.JOBS.BY_DEPARTMENT, { department }), {
+        headers: getAuthHeaders()
+      });
       return handleApiResponse(response);
     },
     
@@ -172,20 +253,36 @@ export const dashboardApi = {
         headers: getAuthHeaders()
       });
       return handleApiResponse(response);
+    },
+    
+    publish: async (id: string) => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.JOBS.PUBLISH, { id }), {
+        method: 'POST',
+        headers: getAuthHeaders()
+      });
+      return handleApiResponse(response);
+    },
+    
+    close: async (id: string) => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.JOBS.CLOSE, { id }), {
+        method: 'POST',
+        headers: getAuthHeaders()
+      });
+      return handleApiResponse(response);
     }
   },
   
-  // Career Applications
-  careerApplications: {
+  // Applications
+  applications: {
     list: async () => {
-      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.CAREER_APPLICATIONS.LIST), {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.APPLICATIONS.LIST), {
         headers: getAuthHeaders()
       });
       return handleApiResponse(response);
     },
     
     create: async (applicationData: any) => {
-      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.CAREER_APPLICATIONS.CREATE), {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.APPLICATIONS.CREATE), {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify(applicationData)
@@ -194,14 +291,14 @@ export const dashboardApi = {
     },
     
     getById: async (id: string) => {
-      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.CAREER_APPLICATIONS.GET_BY_ID, { id }), {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.APPLICATIONS.GET_BY_ID, { id }), {
         headers: getAuthHeaders()
       });
       return handleApiResponse(response);
     },
     
     update: async (id: string, applicationData: any) => {
-      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.CAREER_APPLICATIONS.UPDATE, { id }), {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.APPLICATIONS.UPDATE, { id }), {
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify(applicationData)
@@ -210,18 +307,143 @@ export const dashboardApi = {
     },
     
     delete: async (id: string) => {
-      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.CAREER_APPLICATIONS.DELETE, { id }), {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.APPLICATIONS.DELETE, { id }), {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
       return handleApiResponse(response);
     },
     
+    getByStatus: async (status: string) => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.APPLICATIONS.BY_STATUS, { status }), {
+        headers: getAuthHeaders()
+      });
+      return handleApiResponse(response);
+    },
+    
+    getRecent: async () => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.APPLICATIONS.RECENT), {
+        headers: getAuthHeaders()
+      });
+      return handleApiResponse(response);
+    },
+    
+    getStatistics: async () => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.APPLICATIONS.STATISTICS), {
+        headers: getAuthHeaders()
+      });
+      return handleApiResponse(response);
+    },
+    
+    search: async (query: string) => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.APPLICATIONS.SEARCH) + `?q=${encodeURIComponent(query)}`, {
+        headers: getAuthHeaders()
+      });
+      return handleApiResponse(response);
+    },
+    
     updateStatus: async (id: string, status: string) => {
-      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.CAREER_APPLICATIONS.UPDATE_STATUS, { id }), {
-        method: 'PATCH',
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.APPLICATIONS.UPDATE_STATUS, { id }), {
+        method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify({ status })
+      });
+      return handleApiResponse(response);
+    }
+  },
+  
+  // Interview Candidates
+  interviewCandidates: {
+    list: async () => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.INTERVIEW_CANDIDATES.LIST), {
+        headers: getAuthHeaders()
+      });
+      return handleApiResponse(response);
+    },
+    
+    create: async (candidateData: any) => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.INTERVIEW_CANDIDATES.CREATE), {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(candidateData)
+      });
+      return handleApiResponse(response);
+    },
+    
+    getById: async (id: string) => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.INTERVIEW_CANDIDATES.GET_BY_ID, { id }), {
+        headers: getAuthHeaders()
+      });
+      return handleApiResponse(response);
+    },
+    
+    getStatistics: async () => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.INTERVIEW_CANDIDATES.STATISTICS), {
+        headers: getAuthHeaders()
+      });
+      return handleApiResponse(response);
+    },
+    
+    getFollowUp: async () => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.INTERVIEW_CANDIDATES.FOLLOW_UP), {
+        headers: getAuthHeaders()
+      });
+      return handleApiResponse(response);
+    },
+    
+    getUpcomingInterviews: async () => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.INTERVIEW_CANDIDATES.UPCOMING_INTERVIEWS), {
+        headers: getAuthHeaders()
+      });
+      return handleApiResponse(response);
+    },
+    
+    getByInterviewer: async (interviewerId: string) => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.INTERVIEW_CANDIDATES.BY_INTERVIEWER, { interviewerId }), {
+        headers: getAuthHeaders()
+      });
+      return handleApiResponse(response);
+    },
+    
+    getByStage: async (stage: string) => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.INTERVIEW_CANDIDATES.BY_STAGE, { stage }), {
+        headers: getAuthHeaders()
+      });
+      return handleApiResponse(response);
+    },
+    
+    scheduleInterview: async (id: string, interviewData: any) => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.INTERVIEW_CANDIDATES.SCHEDULE_INTERVIEW, { id }), {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(interviewData)
+      });
+      return handleApiResponse(response);
+    },
+    
+    makeDecision: async (id: string, decisionData: any) => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.INTERVIEW_CANDIDATES.MAKE_DECISION, { id }), {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(decisionData)
+      });
+      return handleApiResponse(response);
+    },
+    
+    addCommunication: async (id: string, communicationData: any) => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.INTERVIEW_CANDIDATES.ADD_COMMUNICATION, { id }), {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(communicationData)
+      });
+      return handleApiResponse(response);
+    },
+    
+    createOffer: async (id: string, offerData: any) => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.INTERVIEW_CANDIDATES.CREATE_OFFER, { id }), {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(offerData)
       });
       return handleApiResponse(response);
     }

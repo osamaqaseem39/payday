@@ -38,16 +38,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkAuthStatus = async (token: string) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/me`, {
+      console.log('Checking auth status with token:', token ? 'Present' : 'Missing');
+      const response = await fetch(`${API_BASE_URL}/auth/profile`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
       
+      console.log('Auth check response status:', response.status);
+      
       if (response.ok) {
-        const userData = await response.json();
-        setUser(userData);
+        const responseData = await response.json();
+        console.log('User data:', responseData);
+        setUser(responseData.data);
       } else {
+        console.log('Auth check failed, removing token');
         localStorage.removeItem('authToken');
       }
     } catch (error) {
@@ -60,6 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
+      console.log('Attempting login for:', email);
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
@@ -68,13 +74,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ email, password }),
       });
 
+      console.log('Login response status:', response.status);
+
       if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('authToken', data.token);
-        setUser(data.user);
+        const responseData = await response.json();
+        console.log('Login response data:', responseData);
+        const { token, user } = responseData.data;
+        console.log('Login successful, token received:', token ? 'Yes' : 'No');
+        localStorage.setItem('authToken', token);
+        setUser(user);
         return true;
       } else {
         const errorData = await response.json();
+        console.log('Login failed:', errorData);
         throw new Error(errorData.message || 'Login failed');
       }
     } catch (error) {
@@ -94,9 +106,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('authToken', data.token);
-        setUser(data.user);
+        const responseData = await response.json();
+        const { token, user } = responseData.data;
+        localStorage.setItem('authToken', token);
+        setUser(user);
         return true;
       } else {
         const errorData = await response.json();

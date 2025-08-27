@@ -456,9 +456,15 @@ export const dashboardApi = {
       const formData = new FormData();
       formData.append('resume', file);
       
+      const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.UPLOAD.RESUME), {
         method: 'POST',
-        headers: getAuthHeaders(),
+        headers,
         body: formData
       });
       return handleApiResponse(response);
@@ -468,9 +474,15 @@ export const dashboardApi = {
       const formData = new FormData();
       formData.append('document', file);
       
+      const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.UPLOAD.DOCUMENT), {
         method: 'POST',
-        headers: getAuthHeaders(),
+        headers,
         body: formData
       });
       return handleApiResponse(response);

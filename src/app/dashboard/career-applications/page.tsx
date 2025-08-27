@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import { FaEye, FaTrash, FaEdit, FaSearch, FaFilter, FaDownload } from 'react-icons/fa';
 import { getDashboardApiUrl, getAuthHeaders } from '@/config/api';
 
@@ -64,18 +65,26 @@ export default function CareerApplicationsPage() {
         ...filters
       });
 
+      // Debug: Check authentication token
+      const token = localStorage.getItem('authToken');
+      console.log('Auth token:', token ? 'Present' : 'Missing');
+      
       // Use dashboard server instead of Next.js API
-      const response = await fetch(`${getDashboardApiUrl('/api/career-applications')}?${params}`, {
+      const response = await fetch(`${getDashboardApiUrl('/api/applications')}?${params}`, {
         credentials: 'include',
         headers: getAuthHeaders()
       });
+      
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
       
       if (response.ok) {
         const data = await response.json();
         setApplications(data.applications);
         setPagination(data.pagination);
       } else {
-        console.error('Failed to fetch applications:', response.status);
+        const errorText = await response.text();
+        console.error('Failed to fetch applications:', response.status, errorText);
       }
     } catch (error) {
       console.error('Error fetching applications:', error);
@@ -86,8 +95,8 @@ export default function CareerApplicationsPage() {
 
   const handleStatusUpdate = async (applicationId: string, status: string, notes?: string) => {
     try {
-      const response = await fetch(`${getDashboardApiUrl(`/api/career-applications/${applicationId}/status`)}`, {
-        method: 'PATCH',
+      const response = await fetch(`${getDashboardApiUrl(`/api/applications/${applicationId}/status`)}`, {
+        method: 'PUT',
         headers: getAuthHeaders(),
         credentials: 'include',
         body: JSON.stringify({ status, notes }),
@@ -108,7 +117,7 @@ export default function CareerApplicationsPage() {
     if (!confirm('Are you sure you want to delete this application?')) return;
 
     try {
-      const response = await fetch(`${getDashboardApiUrl(`/api/career-applications/${applicationId}`)}`, {
+      const response = await fetch(`${getDashboardApiUrl(`/api/applications/${applicationId}`)}`, {
         method: 'DELETE',
         headers: getAuthHeaders(),
         credentials: 'include',
@@ -146,11 +155,51 @@ export default function CareerApplicationsPage() {
   };
 
   return (
-    <DashboardLayout>
-      <div className="p-6">
+    <ProtectedRoute requiredRole="manager">
+      <DashboardLayout>
+        <div className="p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Career Applications</h1>
           <div className="flex space-x-2">
+            <button
+              onClick={async () => {
+                // Test authentication first
+                const token = localStorage.getItem('authToken');
+                console.log('Testing auth with token:', token ? 'Present' : 'Missing');
+                
+                try {
+                  const testResponse = await fetch(`${getDashboardApiUrl('/api/test-auth')}`, {
+                    headers: getAuthHeaders()
+                  });
+                  const testData = await testResponse.json();
+                  console.log('Auth test response:', testData);
+                } catch (error) {
+                  console.error('Auth test failed:', error instanceof Error ? error.message : 'Unknown error');
+                }
+                
+                // Then fetch applications
+                fetchApplications();
+              }}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+            >
+              Test Auth & Refresh
+            </button>
+            <button
+              onClick={async () => {
+                try {
+                  const response = await fetch(`${getDashboardApiUrl('/api/test')}`);
+                  const data = await response.json();
+                  console.log('Basic server test response:', data);
+                  alert('Server communication test: ' + data.message);
+                } catch (error) {
+                  console.error('Server test failed:', error);
+                  alert('Server communication test failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
+                }
+              }}
+              className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700"
+            >
+              Test Server
+            </button>
             <button
               onClick={() => fetchApplications()}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -462,6 +511,7 @@ export default function CareerApplicationsPage() {
           </div>
         )}
       </div>
-    </DashboardLayout>
+      </DashboardLayout>
+    </ProtectedRoute>
   );
 } 

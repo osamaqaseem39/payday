@@ -33,13 +33,32 @@ export default function ApplicationsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [authStatus, setAuthStatus] = useState<string>('Checking...');
 
   useEffect(() => {
+    // Check authentication status
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      setAuthStatus(`✅ Authenticated (Token: ${token.substring(0, 20)}...)`);
+    } else {
+      setAuthStatus('❌ No authentication token found');
+    }
+    
     fetchApplications();
   }, []);
 
   const fetchApplications = async () => {
     try {
+      setLoading(true);
+      
+      // Debug: Check authentication state
+      const token = localStorage.getItem('authToken');
+      console.log('🔐 Fetching applications - Auth token present:', !!token);
+      if (token) {
+        console.log('🔐 Token length:', token.length);
+        console.log('🔐 Token preview:', token.substring(0, 20) + '...');
+      }
+      
       const data = await dashboardApi.applications.list();
       if (Array.isArray(data)) {
         setApplications(data);
@@ -47,8 +66,18 @@ export default function ApplicationsPage() {
         console.error('API returned non-array data:', data);
         setApplications([]);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching applications:', error);
+      
+      // Check if it's an authentication error
+      if (error.message && error.message.includes('Authentication failed')) {
+        console.log('🔐 Authentication error detected, redirecting to login...');
+        // Clear invalid token and redirect to login
+        localStorage.removeItem('authToken');
+        window.location.href = '/login';
+        return;
+      }
+      
       setApplications([]);
     } finally {
       setLoading(false);
@@ -135,6 +164,105 @@ export default function ApplicationsPage() {
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Applications</h1>
                 <p className="text-gray-600">Manage job applications and candidates</p>
+              </div>
+            </div>
+
+            {/* Authentication Status */}
+            <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-blue-800">Authentication Status</h3>
+                    <div className="mt-2 text-sm text-blue-700">
+                      <p>{authStatus}</p>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={async () => {
+                    try {
+                      console.log('🧪 Testing authentication manually...');
+                      const token = localStorage.getItem('authToken');
+                      if (!token) {
+                        alert('No authentication token found. Please log in first.');
+                        return;
+                      }
+                      
+                      const response = await fetch('https://payday-new.vercel.app/api/applications', {
+                        headers: {
+                          'Authorization': `Bearer ${token}`,
+                          'Content-Type': 'application/json'
+                        }
+                      });
+                      
+                      console.log('🧪 Manual test response status:', response.status);
+                      console.log('🧪 Manual test response headers:', Object.fromEntries(response.headers.entries()));
+                      
+                      if (response.ok) {
+                        const data = await response.json();
+                        console.log('🧪 Manual test success:', data);
+                        alert('✅ Authentication test successful! Check console for details.');
+                      } else {
+                        const errorData = await response.json();
+                        console.log('🧪 Manual test failed:', errorData);
+                        alert(`❌ Authentication test failed: ${response.status} - ${errorData.message || 'Unknown error'}`);
+                      }
+                    } catch (error: any) {
+                      console.error('🧪 Manual test error:', error);
+                      alert(`❌ Authentication test error: ${error.message}`);
+                    }
+                  }}
+                  className="px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  Test Auth
+                </button>
+                <button
+                  onClick={async () => {
+                    try {
+                      console.log('🔐 Testing login flow...');
+                      const response = await fetch('https://payday-new.vercel.app/api/auth/login', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                          email: 'admin@payday.com',
+                          password: 'admin123'
+                        })
+                      });
+                      
+                      console.log('🔐 Login test response status:', response.status);
+                      
+                      if (response.ok) {
+                        const data = await response.json();
+                        console.log('🔐 Login test success:', data);
+                        
+                        if (data.data && data.data.token) {
+                          localStorage.setItem('authToken', data.data.token);
+                          setAuthStatus(`✅ Login successful! Token: ${data.data.token.substring(0, 20)}...`);
+                          alert('✅ Login test successful! Token stored. Now try the Test Auth button.');
+                        } else {
+                          alert('❌ Login response missing token data');
+                        }
+                      } else {
+                        const errorData = await response.json();
+                        console.log('🔐 Login test failed:', errorData);
+                        alert(`❌ Login test failed: ${response.status} - ${errorData.message || 'Unknown error'}`);
+                      }
+                    } catch (error: any) {
+                      console.error('🔐 Login test error:', error);
+                      alert(`❌ Login test error: ${error.message}`);
+                    }
+                  }}
+                  className="px-3 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 ml-2"
+                >
+                  Test Login
+                </button>
               </div>
             </div>
 

@@ -37,9 +37,14 @@ export default function AdminPage() {
   const fetchUsers = async () => {
     try {
       const data = await dashboardApi.admin.users.list();
+      console.log('Fetched users data:', data);
+      
       if (Array.isArray(data)) {
         setUsers(data);
+      } else if (data && typeof data === 'object' && 'data' in data && Array.isArray(data.data)) {
+        setUsers(data.data);
       } else {
+        console.log('No valid users data found:', data);
         setUsers([]);
       }
     } catch (error) {

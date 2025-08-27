@@ -116,7 +116,14 @@ export const handleApiResponse = async (response: Response) => {
     throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
   }
   
-  return response.json();
+  const data = await response.json();
+  
+  // If the response has a data property, return it, otherwise return the whole response
+  if (data && typeof data === 'object' && 'data' in data) {
+    return data.data;
+  }
+  
+  return data;
 };
 
 // Dashboard API service functions

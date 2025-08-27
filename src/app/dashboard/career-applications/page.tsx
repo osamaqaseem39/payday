@@ -81,7 +81,15 @@ export default function CareerApplicationsPage() {
     }
     
     if (user && (user.role === 'admin' || user.role === 'manager')) {
-      fetchApplications();
+      // Check if we have a valid token before fetching
+      const token = localStorage.getItem('authToken');
+      if (token && token.trim() !== '') {
+        console.log('✅ User authenticated and authorized, fetching applications');
+        fetchApplications();
+      } else {
+        console.log('⚠️ No valid token found, redirecting to login');
+        window.location.href = '/login';
+      }
     }
   }, [user]);
 
@@ -93,17 +101,29 @@ export default function CareerApplicationsPage() {
       const token = localStorage.getItem('authToken');
       console.log('🔐 Auth token:', token ? 'Present' : 'Missing');
       console.log('🔐 Token value:', token ? token.substring(0, 20) + '...' : 'None');
+      console.log('🔐 Token length:', token ? token.length : 0);
+      console.log('🔐 Token trimmed:', token ? token.trim() : 'N/A');
       
       // Debug: Check if user is authenticated
-      if (!token) {
-        console.error('❌ No auth token found. User needs to login first.');
+      if (!token || token.trim() === '') {
+        console.error('❌ No auth token found or token is empty. User needs to login first.');
         setApplications([]);
         setInterviewCandidates([]);
         setLoading(false);
+        // Redirect to login if no token
+        window.location.href = '/login';
         return;
       }
       
       console.log('🚀 Attempting to fetch both applications and interview candidates...');
+      console.log('🔐 Current user:', user);
+      console.log('🔐 User role:', user?.role);
+      
+      // Test the token format
+      console.log('🔐 Token format check:');
+      console.log('  - Starts with Bearer:', token.startsWith('Bearer ') ? 'Yes' : 'No');
+      console.log('  - Contains dots:', token.includes('.') ? 'Yes' : 'No');
+      console.log('  - Length reasonable:', token.length > 50 ? 'Yes' : 'No');
       
       // Fetch both types of data
       const [applications, candidates] = await Promise.all([
@@ -131,9 +151,14 @@ export default function CareerApplicationsPage() {
       }
     } catch (error: any) {
       console.error('❌ Error fetching data:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
       
       // Handle authentication errors
-      if (error.message?.includes('Authentication failed')) {
+      if (error.message?.includes('Authentication failed') || error.message?.includes('No token provided')) {
         console.log('🔄 Redirecting to login due to authentication failure');
         // Clear token and redirect to login
         localStorage.removeItem('authToken');

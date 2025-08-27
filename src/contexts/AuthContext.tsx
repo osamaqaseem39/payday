@@ -78,7 +78,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log('Login response data:', responseData);
         const { token, user } = responseData.data;
         console.log('Login successful, token received:', token ? 'Yes' : 'No');
+        console.log('Token details:', {
+          present: !!token,
+          length: token ? token.length : 0,
+          startsWithBearer: token ? token.startsWith('Bearer ') : false,
+          containsDots: token ? token.includes('.') : false
+        });
+        
+        // Store the token
         localStorage.setItem('authToken', token);
+        console.log('✅ Token stored in localStorage');
+        
+        // Verify token was stored correctly
+        const storedToken = localStorage.getItem('authToken');
+        console.log('✅ Stored token verification:', {
+          present: !!storedToken,
+          length: storedToken ? storedToken.length : 0,
+          matches: storedToken === token
+        });
+        
         setUser(user);
         return true;
       } else {

@@ -110,6 +110,8 @@ export const getAuthHeaders = (): Record<string, string> => {
     if (token) {
       console.log('🔐 Token length:', token.length);
       console.log('🔐 Token preview:', token.substring(0, 20) + '...');
+    } else {
+      console.log('⚠️ No auth token found in localStorage');
     }
   }
   
@@ -117,8 +119,11 @@ export const getAuthHeaders = (): Record<string, string> => {
     'Content-Type': 'application/json',
   };
   
-  if (token) {
+  if (token && token.trim() !== '') {
     headers['Authorization'] = `Bearer ${token}`;
+    console.log('🔐 Authorization header added');
+  } else {
+    console.log('⚠️ No valid token found, skipping Authorization header');
   }
   
   return headers;
@@ -314,9 +319,20 @@ export const dashboardApi = {
   // Applications
   applications: {
     list: async () => {
-      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.APPLICATIONS.LIST), {
-        headers: getAuthHeaders()
+      const headers = getAuthHeaders();
+      console.log('🔐 Applications.list - Headers being sent:', headers);
+      console.log('🔐 Applications.list - Authorization header present:', !!headers.Authorization);
+      
+      const url = getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.APPLICATIONS.LIST);
+      console.log('🔐 Applications.list - URL:', url);
+      
+      const response = await fetch(url, {
+        headers
       });
+      
+      console.log('🔐 Applications.list - Response status:', response.status);
+      console.log('🔐 Applications.list - Response headers:', Object.fromEntries(response.headers.entries()));
+      
       return handleApiResponse(response);
     },
     

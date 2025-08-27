@@ -14,6 +14,7 @@ const API_CONFIG = {
         PROFILE: '/api/auth/profile',
         UPDATE_PROFILE: '/api/auth/profile'
       },
+      
       JOBS: {
         LIST: '/api/jobs',
         SEARCH: '/api/jobs/search',

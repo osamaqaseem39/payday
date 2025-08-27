@@ -4,8 +4,7 @@ import { useState, useEffect } from 'react';
 import { HiUser, HiShieldCheck, HiPencil, HiTrash, HiPlus, HiSearch, HiMail, HiCalendar } from 'react-icons/hi';
 import DashboardLayout from '../../../components/DashboardLayout';
 import ProtectedRoute from '../../../components/ProtectedRoute';
-
-const API_BASE_URL = 'https://payday-new.vercel.app/api';
+import { dashboardApi, getAuthHeaders } from '../../../config/api';
 
 interface User {
   _id: string;
@@ -37,26 +36,14 @@ export default function AdminPage() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/users`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (Array.isArray(data)) {
-          setUsers(data);
-        } else {
-          setUsers([]);
-        }
+      const data = await dashboardApi.admin.users.list();
+      if (Array.isArray(data)) {
+        setUsers(data);
       } else {
-        // No users found
         setUsers([]);
       }
     } catch (error) {
       console.error('Error fetching users:', error);
-      // Error occurred, set empty array
       setUsers([]);
     } finally {
       setLoading(false);
@@ -69,37 +56,16 @@ export default function AdminPage() {
     try {
       if (editingUser) {
         // Update existing user
-        const response = await fetch(`${API_BASE_URL}/admin/users/${editingUser._id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-          },
-          body: JSON.stringify(formData)
-        });
-        
-        if (response.ok) {
-          setUsers(users.map(user => 
-            user._id === editingUser._id 
-              ? { ...user, ...formData }
-              : user
-          ));
-        }
+        await dashboardApi.admin.users.update(editingUser._id, formData);
+        setUsers(users.map(user => 
+          user._id === editingUser._id 
+            ? { ...user, ...formData }
+            : user
+        ));
       } else {
         // Create new user
-        const response = await fetch(`${API_BASE_URL}/admin/users`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-          },
-          body: JSON.stringify(formData)
-        });
-        
-        if (response.ok) {
-          const newUser = await response.json();
-          setUsers([...users, newUser]);
-        }
+        const newUser = await dashboardApi.admin.users.create(formData);
+        setUsers([...users, newUser]);
       }
       
       setShowModal(false);
@@ -124,16 +90,8 @@ export default function AdminPage() {
   const handleDelete = async (userId: string) => {
     if (confirm('Are you sure you want to delete this user?')) {
       try {
-        const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-          }
-        });
-        
-        if (response.ok) {
-          setUsers(users.filter(user => user._id !== userId));
-        }
+        await dashboardApi.admin.users.delete(userId);
+        setUsers(users.filter(user => user._id !== userId));
       } catch (error) {
         console.error('Error deleting user:', error);
       }

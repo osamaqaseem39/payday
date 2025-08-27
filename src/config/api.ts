@@ -62,6 +62,12 @@ const API_CONFIG = {
         RESUME: '/api/upload/resume',
         DOCUMENT: '/api/upload/document',
         IMAGE: '/api/upload/image'
+      },
+      ADMIN: {
+        USERS: '/api/admin/users',
+        GET_USER: '/api/admin/users/:id',
+        UPDATE_USER: '/api/admin/users/:id',
+        DELETE_USER: '/api/admin/users/:id'
       }
     },
     
@@ -447,6 +453,51 @@ export const dashboardApi = {
         body: JSON.stringify(offerData)
       });
       return handleApiResponse(response);
+    }
+  },
+
+  // Admin
+  admin: {
+    users: {
+      list: async () => {
+        const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.ADMIN.USERS), {
+          headers: getAuthHeaders()
+        });
+        return handleApiResponse(response);
+      },
+
+      getById: async (id: string) => {
+        const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.ADMIN.GET_USER, { id }), {
+          headers: getAuthHeaders()
+        });
+        return handleApiResponse(response);
+      },
+
+      create: async (userData: any) => {
+        const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.ADMIN.USERS), {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(userData)
+        });
+        return handleApiResponse(response);
+      },
+
+      update: async (id: string, userData: any) => {
+        const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.ADMIN.UPDATE_USER, { id }), {
+          method: 'PUT',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(userData)
+        });
+        return handleApiResponse(response);
+      },
+
+      delete: async (id: string) => {
+        const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.ADMIN.DELETE_USER, { id }), {
+          method: 'DELETE',
+          headers: getAuthHeaders()
+        });
+        return handleApiResponse(response);
+      }
     }
   },
   

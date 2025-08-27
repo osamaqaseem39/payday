@@ -188,53 +188,6 @@ export default function CareerApplicationsPage() {
                 <h1 className="text-2xl font-bold text-gray-900">Career Applications</h1>
                 <p className="text-gray-600">Review and manage job applications</p>
               </div>
-              <div className="flex space-x-2">
-                <button
-                  onClick={async () => {
-                    // Test authentication first
-                    const token = localStorage.getItem('authToken');
-                    console.log('Testing auth with token:', token ? 'Present' : 'Missing');
-                    
-                    try {
-                      const testResponse = await fetch(`${getDashboardApiUrl('/api/test-auth')}`, {
-                        headers: getAuthHeaders()
-                      });
-                      const testData = await testResponse.json();
-                      console.log('Auth test response:', testData);
-                    } catch (error) {
-                      console.error('Auth test failed:', error instanceof Error ? error.message : 'Unknown error');
-                    }
-                    
-                    // Then fetch applications
-                    fetchApplications();
-                  }}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                >
-                  Test Auth & Refresh
-                </button>
-                <button
-                  onClick={async () => {
-                    try {
-                      const response = await fetch(`${getDashboardApiUrl('/api/test')}`);
-                      const data = await response.json();
-                      console.log('Basic server test response:', data);
-                      alert('Server communication test: ' + data.message);
-                    } catch (error) {
-                      console.error('Server test failed:', error);
-                      alert('Server communication test failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
-                    }
-                  }}
-                  className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700"
-                >
-                  Test Server
-                </button>
-                <button
-                  onClick={() => fetchApplications()}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  Refresh
-                </button>
-              </div>
             </div>
 
             {/* Filters and Search */}

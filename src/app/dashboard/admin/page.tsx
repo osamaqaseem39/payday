@@ -9,10 +9,9 @@ const API_BASE_URL = 'https://payday-new.vercel.app/api';
 
 interface User {
   _id: string;
-  firstName: string;
-  lastName: string;
+  name: string;
   email: string;
-  role: 'admin' | 'hr_manager' | 'hr_staff' | 'interviewer';
+  role: 'admin' | 'user' | 'manager';
   isActive: boolean;
   createdAt: string;
 }
@@ -23,10 +22,9 @@ export default function AdminPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
-    role: 'hr_staff' as 'admin' | 'hr_manager' | 'hr_staff' | 'interviewer',
+    role: 'user' as 'admin' | 'user' | 'manager',
     isActive: true
   });
 
@@ -103,7 +101,7 @@ export default function AdminPage() {
       
       setShowModal(false);
       setEditingUser(null);
-             setFormData({ firstName: '', lastName: '', email: '', role: 'hr_staff', isActive: true });
+             setFormData({ name: '', email: '', role: 'user', isActive: true });
     } catch (error) {
       console.error('Error saving user:', error);
     }
@@ -112,8 +110,7 @@ export default function AdminPage() {
   const handleEdit = (user: User) => {
     setEditingUser(user);
     setFormData({
-      firstName: user.firstName,
-      lastName: user.lastName,
+      name: user.name,
       email: user.email,
       role: user.role,
       isActive: user.isActive
@@ -144,12 +141,10 @@ export default function AdminPage() {
     switch (role) {
       case 'admin':
         return 'bg-red-100 text-red-800';
-      case 'hr_manager':
+      case 'manager':
         return 'bg-blue-100 text-blue-800';
-      case 'hr_staff':
+      case 'user':
         return 'bg-green-100 text-green-800';
-      case 'interviewer':
-        return 'bg-purple-100 text-purple-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -217,7 +212,7 @@ export default function AdminPage() {
                               <HiUser className="h-5 w-5 text-blue-600" />
                             </div>
                                                          <div className="ml-4">
-                               <div className="text-sm font-medium text-gray-900">{user.firstName} {user.lastName}</div>
+                               <div className="text-sm font-medium text-gray-900">{user.name}</div>
                                <div className="text-sm text-gray-500">{user.email}</div>
                              </div>
                           </div>
@@ -273,21 +268,11 @@ export default function AdminPage() {
                 </h3>
                 <form onSubmit={handleSubmit} className="space-y-4">
                                      <div>
-                     <label className="block text-sm font-medium text-gray-700">First Name</label>
+                     <label className="block text-sm font-medium text-gray-700">Name</label>
                      <input
                        type="text"
-                       value={formData.firstName}
-                       onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                       required
-                     />
-                   </div>
-                   <div>
-                     <label className="block text-sm font-medium text-gray-700">Last Name</label>
-                     <input
-                       type="text"
-                       value={formData.lastName}
-                       onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                       value={formData.name}
+                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                        required
                      />
@@ -309,10 +294,9 @@ export default function AdminPage() {
                        onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                      >
-                       <option value="hr_staff">HR Staff</option>
-                       <option value="interviewer">Interviewer</option>
-                       <option value="hr_manager">HR Manager</option>
-                       <option value="admin">Administrator</option>
+                       <option value="user">User</option>
+                       <option value="manager">Manager</option>
+                       <option value="admin">Admin</option>
                      </select>
                   </div>
                                      <div>
@@ -332,7 +316,7 @@ export default function AdminPage() {
                                              onClick={() => {
                          setShowModal(false);
                          setEditingUser(null);
-                         setFormData({ firstName: '', lastName: '', email: '', role: 'hr_staff', isActive: true });
+                         setFormData({ name: '', email: '', role: 'user', isActive: true });
                        }}
                       className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
                     >

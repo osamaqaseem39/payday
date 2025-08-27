@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 
 // Dashboard server configuration
-const DASHBOARD_SERVER = process.env.NEXT_PUBLIC_DASHBOARD_SERVER || 'https://payday-server.vercel.app';
+const DASHBOARD_SERVER = process.env.NEXT_PUBLIC_DASHBOARD_SERVER || 'https://payday-new.vercel.app';
 
 // Configure SMTP transporter
 const transporter = nodemailer.createTransport({

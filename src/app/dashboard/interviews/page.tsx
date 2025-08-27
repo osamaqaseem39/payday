@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { HiEye, HiPencil, HiTrash, HiCalendar, HiClock, HiCheckCircle, HiXCircle } from 'react-icons/hi';
 
-const API_BASE_URL = 'https://payday-server.vercel.app/api';
+const API_BASE_URL = 'https://payday-new.vercel.app/api';
 
 interface Interview {
   _id: string;

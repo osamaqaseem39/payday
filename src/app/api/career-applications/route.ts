@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
 
     // TODO: Replace mock data with proxy to backend server
-    // const backendUrl = process.env.NEXT_PUBLIC_DASHBOARD_SERVER || 'https://payday-server.vercel.app';
+    // const backendUrl = process.env.NEXT_PUBLIC_DASHBOARD_SERVER || 'https://payday-new.vercel.app';
     // const response = await fetch(`${backendUrl}/api/career-applications?${searchParams.toString()}`);
     // return NextResponse.json(await response.json());
 

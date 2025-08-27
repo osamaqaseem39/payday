@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-const API_BASE_URL = 'https://payday-server.vercel.app/api';
+const API_BASE_URL = 'https://payday-new.vercel.app/api';
 
 interface User {
   _id: string;

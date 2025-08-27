@@ -1,7 +1,7 @@
 // Website API Configuration
 const API_CONFIG = {
   // Dashboard server URL - change this for production
-  DASHBOARD_SERVER: process.env.NEXT_PUBLIC_DASHBOARD_SERVER || 'http://localhost:3000',
+  DASHBOARD_SERVER: process.env.NEXT_PUBLIC_DASHBOARD_SERVER || 'https://payday-new.vercel.app',
   
   // API endpoints
   ENDPOINTS: {
@@ -113,6 +113,16 @@ export const getAuthHeaders = (): Record<string, string> => {
 export const handleApiResponse = async (response: Response) => {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
+    
+    // Handle authentication errors specifically
+    if (response.status === 401) {
+      // Clear invalid token
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('authToken');
+      }
+      throw new Error('Authentication failed. Please log in again.');
+    }
+    
     throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
   }
   

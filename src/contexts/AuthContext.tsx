@@ -1,8 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-
-const API_BASE_URL = 'https://payday-new.vercel.app/api';
+import { getDashboardApiUrl, getAuthHeaders } from '../config/api';
 
 interface User {
   _id: string;
@@ -39,10 +38,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const checkAuthStatus = async (token: string) => {
     try {
       console.log('Checking auth status with token:', token ? 'Present' : 'Missing');
-      const response = await fetch(`${API_BASE_URL}/auth/profile`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      const response = await fetch(getDashboardApiUrl('/api/auth/profile'), {
+        headers: getAuthHeaders()
       });
       
       console.log('Auth check response status:', response.status);
@@ -66,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       console.log('Attempting login for:', email);
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      const response = await fetch(getDashboardApiUrl('/api/auth/login'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -97,7 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+      const response = await fetch(getDashboardApiUrl('/api/auth/register'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -126,17 +123,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
-  const value = {
-    user,
-    login,
-    register,
-    logout,
-    loading,
-    isAuthenticated: !!user,
-  };
+  const isAuthenticated = !!user;
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, login, register, logout, loading, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );

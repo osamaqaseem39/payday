@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { HiEye, HiTrash, HiSearch, HiMail, HiPhone, HiCalendar, HiDocumentText, HiDownload } from 'react-icons/hi';
@@ -118,8 +118,18 @@ export default function CareerApplicationsPage() {
         console.warn('⚠️ Unexpected candidates data format:', candidates);
         setInterviewCandidates([]);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Error fetching data:', error);
+      
+      // Handle authentication errors
+      if (error.message?.includes('Authentication failed')) {
+        console.log('🔄 Redirecting to login due to authentication failure');
+        // Clear token and redirect to login
+        localStorage.removeItem('authToken');
+        window.location.href = '/login';
+        return;
+      }
+      
       setApplications([]);
       setInterviewCandidates([]);
     } finally {
@@ -570,12 +580,12 @@ export default function CareerApplicationsPage() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Resume</label>
                       <a
-                        href={selectedApplication.resume.url}
+                        href={selectedApplication.resume?.url || '#'}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:text-blue-800 text-sm"
                       >
-                        {selectedApplication.resume.name}
+                        {selectedApplication.resume?.name || 'Download Resume'}
                       </a>
                     </div>
 

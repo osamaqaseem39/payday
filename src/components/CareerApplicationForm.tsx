@@ -68,12 +68,18 @@ export default function CareerApplicationForm({ jobId, jobTitle }: CareerApplica
         position: formData.position,
         experience: formData.experience,
         coverLetter: formData.coverLetter,
-        resumeUrl: formData.resume?.url || '',
-        resumeName: formData.resume?.name || '',
-        jobId: jobId || ''
+        resume: formData.resume ? {
+          filename: formData.resume.name,
+          path: formData.resume.url,
+          mimetype: 'application/pdf', // Default mimetype
+          size: 0 // Size will be set by the server
+        } : undefined
       };
 
-      const response = await fetch(getDashboardApiUrl('/api/career-applications/submit'), {
+      console.log('📤 Submitting application data:', applicationData);
+      console.log('🌐 API URL:', getDashboardApiUrl('/api/applications'));
+
+      const response = await fetch(getDashboardApiUrl('/api/applications'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -81,7 +87,12 @@ export default function CareerApplicationForm({ jobId, jobTitle }: CareerApplica
         body: JSON.stringify(applicationData),
       });
 
+      console.log('📥 Response status:', response.status);
+      console.log('📥 Response headers:', response.headers);
+      
       if (response.ok) {
+        const successData = await response.json();
+        console.log('✅ Success response:', successData);
         setSubmitStatus('success');
         setFormData({
           firstName: '',
@@ -95,6 +106,7 @@ export default function CareerApplicationForm({ jobId, jobTitle }: CareerApplica
         });
       } else {
         const errorData = await response.json();
+        console.log('❌ Error response:', errorData);
         setSubmitStatus('error');
         setErrorMessage(errorData.message || 'Something went wrong. Please try again.');
       }
@@ -247,21 +259,20 @@ export default function CareerApplicationForm({ jobId, jobTitle }: CareerApplica
             <label htmlFor="experience" className="block text-sm font-medium text-gray-700 mb-2">
               Years of Experience *
             </label>
-            <select
-              id="experience"
-              name="experience"
-              value={formData.experience}
-              onChange={handleInputChange}
-              required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">Select experience level</option>
-              <option value="0-1 years">0-1 years</option>
-              <option value="1-3 years">1-3 years</option>
-              <option value="3-5 years">3-5 years</option>
-              <option value="5-10 years">5-10 years</option>
-              <option value="10+ years">10+ years</option>
-            </select>
+                          <select
+                id="experience"
+                name="experience"
+                value={formData.experience}
+                onChange={handleInputChange}
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">Select experience level</option>
+                <option value="entry">Entry Level (0-2 years)</option>
+                <option value="mid">Mid Level (2-5 years)</option>
+                <option value="senior">Senior Level (5-10 years)</option>
+                <option value="expert">Expert Level (10+ years)</option>
+              </select>
           </div>
         </div>
 

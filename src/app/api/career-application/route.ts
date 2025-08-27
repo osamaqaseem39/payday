@@ -18,7 +18,7 @@ const transporter = nodemailer.createTransport({
 // Helper function to submit to dashboard server
 async function submitToDashboard(applicationData: any) {
   try {
-    const response = await fetch(`${DASHBOARD_SERVER}/api/career-applications`, {
+    const response = await fetch(`${DASHBOARD_SERVER}/api/applications`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

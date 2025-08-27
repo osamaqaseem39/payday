@@ -16,13 +16,18 @@ interface FormData {
   resume: { url: string; name: string } | null;
 }
 
-export default function CareerApplicationForm() {
+interface CareerApplicationFormProps {
+  jobId?: string;
+  jobTitle?: string;
+}
+
+export default function CareerApplicationForm({ jobId, jobTitle }: CareerApplicationFormProps) {
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
-    position: '',
+    position: jobTitle || '',
     experience: '',
     coverLetter: '',
     resume: null,
@@ -64,7 +69,8 @@ export default function CareerApplicationForm() {
         experience: formData.experience,
         coverLetter: formData.coverLetter,
         resumeUrl: formData.resume?.url || '',
-        resumeName: formData.resume?.name || ''
+        resumeName: formData.resume?.name || '',
+        jobId: jobId || ''
       };
 
       const response = await fetch(getDashboardApiUrl('/api/career-applications/submit'), {
@@ -82,7 +88,7 @@ export default function CareerApplicationForm() {
           lastName: '',
           email: '',
           phone: '',
-          position: '',
+          position: jobTitle || '',
           experience: '',
           coverLetter: '',
           resume: null,
@@ -207,23 +213,34 @@ export default function CareerApplicationForm() {
             <label htmlFor="position" className="block text-sm font-medium text-gray-700 mb-2">
               Position You're Applying For *
             </label>
-            <select
-              id="position"
-              name="position"
-              value={formData.position}
-              onChange={handleInputChange}
-              required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">Select a position</option>
-              <option value="Senior Software Engineer">Senior Software Engineer</option>
-              <option value="Product Manager">Product Manager</option>
-              <option value="Customer Success Manager">Customer Success Manager</option>
-              <option value="Data Analyst">Data Analyst</option>
-              <option value="Marketing Specialist">Marketing Specialist</option>
-              <option value="Sales Representative">Sales Representative</option>
-              <option value="Other">Other</option>
-            </select>
+            {jobTitle ? (
+              <input
+                type="text"
+                id="position"
+                name="position"
+                value={formData.position}
+                readOnly
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700"
+              />
+            ) : (
+              <select
+                id="position"
+                name="position"
+                value={formData.position}
+                onChange={handleInputChange}
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">Select a position</option>
+                <option value="Senior Software Engineer">Senior Software Engineer</option>
+                <option value="Product Manager">Product Manager</option>
+                <option value="Customer Success Manager">Customer Success Manager</option>
+                <option value="Data Analyst">Data Analyst</option>
+                <option value="Marketing Specialist">Marketing Specialist</option>
+                <option value="Sales Representative">Sales Representative</option>
+                <option value="Other">Other</option>
+              </select>
+            )}
           </div>
 
           <div>

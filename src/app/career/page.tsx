@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CareerApplicationForm from '@/components/CareerApplicationForm';
@@ -35,6 +36,7 @@ interface Job {
 }
 
 export default function CareerPage() {
+  const router = useRouter();
   const [scrollProgress, setScrollProgress] = useState(0);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
@@ -402,12 +404,20 @@ export default function CareerPage() {
                         ))}
                       </div>
                       
-                      <button 
-                        onClick={() => document.getElementById('application-form')?.scrollIntoView({ behavior: 'smooth' })}
-                        className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-                      >
-                        Apply Now
-                      </button>
+                      <div className="flex gap-3">
+                        <button 
+                          onClick={() => document.getElementById('application-form')?.scrollIntoView({ behavior: 'smooth' })}
+                          className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                        >
+                          Apply Now
+                        </button>
+                        <button 
+                          onClick={() => router.push(`/career/${job._id}`)}
+                          className="px-6 py-3 border border-blue-600 text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                        >
+                          View Details
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>

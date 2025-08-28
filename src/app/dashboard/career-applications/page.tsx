@@ -557,8 +557,14 @@ export default function CareerApplicationsPage() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
-                        {(interviewCandidates || []).map((candidate) => (
-                          candidate && (
+                        {(interviewCandidates || []).map((candidate) => {
+                          // Debug: Log candidate data structure
+                          console.log('🔍 Candidate data:', candidate);
+                          console.log('🔍 Career application:', candidate.careerApplication);
+                          
+                          if (!candidate) return null;
+                          
+                          return (
                           <div key={candidate._id} className="bg-white shadow rounded-lg p-6">
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
@@ -570,11 +576,28 @@ export default function CareerApplicationsPage() {
                               <HiMail className="h-4 w-4 text-gray-400" />
                               <p className="text-sm text-gray-500">{candidate.careerApplication?.email || 'Email not available'}</p>
                             </div>
+                            {candidate.careerApplication?.phone && (
+                              <div className="flex items-center space-x-2 mb-2">
+                                <HiPhone className="h-4 w-4 text-gray-400" />
+                                <p className="text-sm text-gray-500">{candidate.careerApplication.phone}</p>
+                              </div>
+                            )}
+                            {candidate.careerApplication?.experience && (
+                              <div className="text-sm text-gray-500">
+                                <span className="font-medium">Experience:</span> {candidate.careerApplication.experience}
+                              </div>
+                            )}
                           </div>
                           <div className="flex flex-col space-y-2">
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(candidate.currentStage || 'screening')}`}>
                               {candidate.currentStage || 'screening'}
                             </span>
+                            {/* Show if candidate was created from application */}
+                            {candidate.careerApplication && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                👥 From Application
+                              </span>
+                            )}
                           </div>
                         </div>
                         
@@ -620,8 +643,8 @@ export default function CareerApplicationsPage() {
                           </div>
                         </div>
                       </div>
-                      )
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </>

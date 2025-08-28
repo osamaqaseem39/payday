@@ -21,6 +21,7 @@ interface Application {
   portfolioUrl?: string;
   linkedinUrl?: string;
   githubUrl?: string;
+  
 }
 
 import DashboardLayout from '../../../components/DashboardLayout';

@@ -561,6 +561,8 @@ export default function CareerApplicationsPage() {
                           // Debug: Log candidate data structure
                           console.log('🔍 Candidate data:', candidate);
                           console.log('🔍 Career application:', candidate.careerApplication);
+                          console.log('🔍 Career application type:', typeof candidate.careerApplication);
+                          console.log('🔍 Career application keys:', candidate.careerApplication ? Object.keys(candidate.careerApplication) : 'null');
                           
                           if (!candidate) return null;
                           
@@ -585,6 +587,13 @@ export default function CareerApplicationsPage() {
                             {candidate.careerApplication?.experience && (
                               <div className="text-sm text-gray-500">
                                 <span className="font-medium">Experience:</span> {candidate.careerApplication.experience}
+                              </div>
+                            )}
+                            
+                            {/* Debug info - remove this later */}
+                            {!candidate.careerApplication?.firstName && (
+                              <div className="text-xs text-red-500 bg-red-50 p-2 rounded">
+                                Debug: Career application not populated. ID: {typeof candidate.careerApplication === 'string' ? candidate.careerApplication : 'Object'}
                               </div>
                             )}
                           </div>

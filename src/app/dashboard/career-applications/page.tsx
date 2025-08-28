@@ -176,28 +176,11 @@ export default function CareerApplicationsPage() {
       // Update application status
       await dashboardApi.applications.updateStatus(applicationId, status);
       
-      // If application is shortlisted, automatically create an interview candidate
-      if (status === 'shortlisted') {
-        try {
-          await dashboardApi.interviewCandidates.createFromApplication(applicationId);
-          console.log('✅ Interview candidate created automatically for shortlisted application');
-          setNotification({
-            type: 'success',
-            message: 'Application shortlisted and interview candidate created automatically!'
-          });
-        } catch (candidateError) {
-          console.error('⚠️ Failed to create interview candidate:', candidateError);
-          setNotification({
-            type: 'error',
-            message: 'Application shortlisted but failed to create interview candidate. Please try again.'
-          });
-        }
-      } else {
-        setNotification({
-          type: 'success',
-          message: `Application status updated to ${status}`
-        });
-      }
+      // Show success notification
+      setNotification({
+        type: 'success',
+        message: `Application status updated to ${status}`
+      });
       
       // Clear notification after 5 seconds
       setTimeout(() => setNotification(null), 5000);
@@ -601,10 +584,10 @@ export default function CareerApplicationsPage() {
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(candidate.currentStage || 'screening')}`}>
                               {candidate.currentStage || 'screening'}
                             </span>
-                            {/* Show if candidate was created from application */}
+                            {/* Show that candidate was created from application */}
                             {candidate.careerApplication && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                👥 From Application
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                ✅ Auto-Created
                               </span>
                             )}
                           </div>
@@ -742,9 +725,9 @@ export default function CareerApplicationsPage() {
                             </svg>
                           </div>
                           <div className="ml-3">
-                            <h4 className="text-sm font-medium text-blue-800">Status Update</h4>
+                            <h4 className="text-sm font-medium text-blue-800">Automatic Candidate Creation</h4>
                             <p className="text-sm text-blue-700">
-                              When you change status to <strong>Shortlisted</strong>, an interview candidate will be automatically created and moved to the screening stage.
+                              <strong>All applications automatically create interview candidates</strong> when submitted. You can now manage them directly from the Interview Candidates tab.
                             </p>
                           </div>
                         </div>

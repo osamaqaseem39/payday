@@ -718,32 +718,41 @@ export default function CareerApplicationsPage() {
                           
                           if (!candidate) return null;
                           
+                          // Check if careerApplication is properly populated
+                          const isPopulated = candidate.careerApplication && 
+                            typeof candidate.careerApplication === 'object' && 
+                            candidate.careerApplication.firstName;
+                          
                           return (
                           <div key={candidate._id} className="bg-white shadow rounded-lg p-6">
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
                             <h3 className="text-lg font-medium text-gray-900 mb-1">
-                              {candidate.careerApplication?.firstName || 'Unknown'} {candidate.careerApplication?.lastName || 'Candidate'}
+                              {isPopulated ? `${candidate.careerApplication.firstName} ${candidate.careerApplication.lastName}` : 'Unknown Candidate'}
                             </h3>
-                            <p className="text-sm text-gray-600 mb-2">{candidate.careerApplication?.position || 'Position not specified'}</p>
+                            <p className="text-sm text-gray-600 mb-2">
+                              {isPopulated ? candidate.careerApplication.position : 'Position not specified'}
+                            </p>
                             <div className="flex items-center space-x-2 mb-2">
                               <HiMail className="h-4 w-4 text-gray-400" />
-                              <p className="text-sm text-gray-500">{candidate.careerApplication?.email || 'Email not available'}</p>
+                              <p className="text-sm text-gray-500">
+                                {isPopulated ? candidate.careerApplication.email : 'Email not available'}
+                              </p>
                             </div>
-                            {candidate.careerApplication?.phone && (
+                            {isPopulated && candidate.careerApplication.phone && (
                               <div className="flex items-center space-x-2 mb-2">
                                 <HiPhone className="h-4 w-4 text-gray-400" />
                                 <div className="text-sm text-gray-500">{candidate.careerApplication.phone}</div>
                               </div>
                             )}
-                            {candidate.careerApplication?.experience && (
+                            {isPopulated && candidate.careerApplication.experience && (
                               <div className="text-sm text-gray-500">
                                 <span className="font-medium">Experience:</span> {candidate.careerApplication.experience}
                               </div>
                             )}
                             
                             {/* Debug info - remove this later */}
-                            {!candidate.careerApplication?.firstName && (
+                            {!isPopulated && (
                               <div className="text-xs text-red-500 bg-red-50 p-2 rounded">
                                 Debug: Career application not populated. ID: {typeof candidate.careerApplication === 'string' ? candidate.careerApplication : 'Object'}
                               </div>
@@ -754,9 +763,13 @@ export default function CareerApplicationsPage() {
                               {candidate.currentStage || 'screening'}
                             </span>
                             {/* Show that candidate was created from application */}
-                            {candidate.careerApplication && (
+                            {isPopulated ? (
                               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                ✅ Auto-Created
+                                ✅ Fully Populated
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                ⚠️ Needs Population
                               </span>
                             )}
                           </div>

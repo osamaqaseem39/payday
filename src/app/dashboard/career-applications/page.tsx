@@ -269,12 +269,12 @@ export default function CareerApplicationsPage() {
 
   const filteredApplications = applications.filter(application => {
     const matchesSearch = 
-      `${application.firstName} ${application.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      application.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      application.position.toLowerCase().includes(searchTerm.toLowerCase());
+      `${application.firstName || ''} ${application.lastName || ''}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (application.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (application.position || '').toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesStatus = statusFilter === 'all' || application.status === statusFilter;
-    const matchesPosition = positionFilter === 'all' || application.position === positionFilter;
+    const matchesStatus = statusFilter === 'all' || (application.status || '') === statusFilter;
+    const matchesPosition = positionFilter === 'all' || (application.position || '') === positionFilter;
     
     return matchesSearch && matchesStatus && matchesPosition;
   });
@@ -439,6 +439,7 @@ export default function CareerApplicationsPage() {
                 ) : (
                   <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
                     {filteredApplications.map((application) => (
+                      application && (
                       <div key={application._id} className="bg-white shadow rounded-lg p-6">
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
@@ -531,6 +532,7 @@ export default function CareerApplicationsPage() {
                           </div>
                         </div>
                       </div>
+                      )
                     ))}
                   </div>
                 )}
@@ -549,28 +551,29 @@ export default function CareerApplicationsPage() {
                 ) : (
                   <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
                     {interviewCandidates.map((candidate) => (
+                      candidate && (
                       <div key={candidate._id} className="bg-white shadow rounded-lg p-6">
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
                             <h3 className="text-lg font-medium text-gray-900 mb-1">
-                              {candidate.careerApplication.firstName} {candidate.careerApplication.lastName}
+                              {candidate.careerApplication?.firstName || 'Unknown'} {candidate.careerApplication?.lastName || 'Candidate'}
                             </h3>
-                            <p className="text-sm text-gray-600 mb-2">{candidate.careerApplication.position}</p>
+                            <p className="text-sm text-gray-600 mb-2">{candidate.careerApplication?.position || 'Position not specified'}</p>
                             <div className="flex items-center space-x-2 mb-2">
                               <HiMail className="h-4 w-4 text-gray-400" />
-                              <p className="text-sm text-gray-500">{candidate.careerApplication.email}</p>
+                              <p className="text-sm text-gray-500">{candidate.careerApplication?.email || 'Email not available'}</p>
                             </div>
                           </div>
                           <div className="flex flex-col space-y-2">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(candidate.currentStage)}`}>
-                              {candidate.currentStage}
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(candidate.currentStage || 'screening')}`}>
+                              {candidate.currentStage || 'screening'}
                             </span>
                           </div>
                         </div>
                         
                         <div className="space-y-2 mb-4">
                           <div className="text-sm">
-                            <span className="font-medium text-gray-700">Stage:</span> {candidate.currentStage}
+                            <span className="font-medium text-gray-700">Stage:</span> {candidate.currentStage || 'screening'}
                           </div>
                           {candidate.overallRating && (
                             <div className="text-sm">
@@ -579,11 +582,11 @@ export default function CareerApplicationsPage() {
                           )}
                           {candidate.skillsAssessment && (
                             <div className="text-sm">
-                              <span className="font-medium text-gray-700">Skills:</span> T:{candidate.skillsAssessment.technical} C:{candidate.skillsAssessment.communication} P:{candidate.skillsAssessment.problemSolving} F:{candidate.skillsAssessment.culturalFit}
+                              <span className="font-medium text-gray-700">Skills:</span> T:{candidate.skillsAssessment.technical || 0} C:{candidate.skillsAssessment.communication || 0} P:{candidate.skillsAssessment.problemSolving || 0} F:{candidate.skillsAssessment.culturalFit || 0}
                             </div>
                           )}
                           <div className="text-sm">
-                            <span className="font-medium text-gray-700">Interviews:</span> {candidate.interviews.length}
+                            <span className="font-medium text-gray-700">Interviews:</span> {candidate.interviews?.length || 0}
                           </div>
                         </div>
                         
@@ -610,6 +613,7 @@ export default function CareerApplicationsPage() {
                           </div>
                         </div>
                       </div>
+                      )
                     ))}
                   </div>
                 )}

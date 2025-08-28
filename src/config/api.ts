@@ -501,6 +501,15 @@ export const dashboardApi = {
         body: JSON.stringify(offerData)
       });
       return handleApiResponse(response);
+    },
+
+    createFromApplication: async (careerApplicationId: string) => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.INTERVIEW_CANDIDATES.CREATE), {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ careerApplicationId })
+      });
+      return handleApiResponse(response);
     }
   },
 

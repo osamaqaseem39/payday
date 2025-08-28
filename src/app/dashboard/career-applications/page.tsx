@@ -71,6 +71,7 @@ export default function CareerApplicationsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [positionFilter, setPositionFilter] = useState('all');
+  const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Check if user has admin or manager access
   useEffect(() => {
@@ -175,11 +176,45 @@ export default function CareerApplicationsPage() {
 
   const handleStatusUpdate = async (applicationId: string, status: string, notes?: string) => {
     try {
+      // Update application status
       await dashboardApi.applications.updateStatus(applicationId, status);
+      
+      // If application is shortlisted, automatically create an interview candidate
+      if (status === 'shortlisted') {
+        try {
+          await dashboardApi.interviewCandidates.createFromApplication(applicationId);
+          console.log('✅ Interview candidate created automatically for shortlisted application');
+          setNotification({
+            type: 'success',
+            message: 'Application shortlisted and interview candidate created automatically!'
+          });
+        } catch (candidateError) {
+          console.error('⚠️ Failed to create interview candidate:', candidateError);
+          setNotification({
+            type: 'error',
+            message: 'Application shortlisted but failed to create interview candidate. Please try again.'
+          });
+        }
+      } else {
+        setNotification({
+          type: 'success',
+          message: `Application status updated to ${status}`
+        });
+      }
+      
+      // Clear notification after 5 seconds
+      setTimeout(() => setNotification(null), 5000);
+      
+      // Refresh data
       fetchApplications();
       setShowModal(false);
     } catch (error) {
       console.error('Error updating status:', error);
+      setNotification({
+        type: 'error',
+        message: 'Failed to update application status'
+      });
+      setTimeout(() => setNotification(null), 5000);
     }
   };
 
@@ -271,6 +306,53 @@ export default function CareerApplicationsPage() {
                 <p className="text-gray-600">Review and manage job applications and interview candidates</p>
               </div>
             </div>
+
+            {/* Notification */}
+            {notification && (
+              <div className={`rounded-md p-4 ${
+                notification.type === 'success' 
+                  ? 'bg-green-50 border border-green-200' 
+                  : 'bg-red-50 border border-red-200'
+              }`}>
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    {notification.type === 'success' ? (
+                      <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </div>
+                  <div className="ml-3">
+                    <p className={`text-sm font-medium ${
+                      notification.type === 'success' ? 'text-green-800' : 'text-red-800'
+                    }`}>
+                      {notification.message}
+                    </p>
+                  </div>
+                  <div className="ml-auto pl-3">
+                    <div className="-mx-1.5 -my-1.5">
+                      <button
+                        onClick={() => setNotification(null)}
+                        className={`inline-flex rounded-md p-1.5 ${
+                          notification.type === 'success' 
+                            ? 'bg-green-50 text-green-500 hover:bg-green-100' 
+                            : 'bg-red-50 text-red-500 hover:bg-red-100'
+                        } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-green-50 focus:ring-green-600`}
+                      >
+                        <span className="sr-only">Dismiss</span>
+                        <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Tabs */}
             <div className="border-b border-gray-200">
@@ -377,6 +459,12 @@ export default function CareerApplicationsPage() {
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(application.status)}`}>
                               {application.status}
                             </span>
+                            {/* Show if application has been converted to candidate */}
+                            {application.status === 'shortlisted' && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                👥 Candidate Created
+                              </span>
+                            )}
                           </div>
                         </div>
                         
@@ -601,27 +689,46 @@ export default function CareerApplicationsPage() {
                       </a>
                     </div>
 
-                    <div className="flex space-x-2 pt-4">
-                      <select
-                        value={selectedApplication.status}
-                        onChange={(e) => {
-                          const newStatus = e.target.value as CareerApplication['status'];
-                          handleStatusUpdate(selectedApplication._id, newStatus);
-                        }}
-                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      >
-                        <option value="pending">Pending</option>
-                        <option value="reviewed">Reviewed</option>
-                        <option value="shortlisted">Shortlisted</option>
-                        <option value="rejected">Rejected</option>
-                        <option value="hired">Hired</option>
-                      </select>
-                      <button
-                        onClick={() => setShowModal(false)}
-                        className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-                      >
-                        Close
-                      </button>
+                    <div className="pt-4">
+                      {/* Status Update Info */}
+                      <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div className="flex items-start">
+                          <div className="flex-shrink-0">
+                            <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                          <div className="ml-3">
+                            <h4 className="text-sm font-medium text-blue-800">Status Update</h4>
+                            <p className="text-sm text-blue-700">
+                              When you change status to <strong>Shortlisted</strong>, an interview candidate will be automatically created and moved to the screening stage.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex space-x-2">
+                        <select
+                          value={selectedApplication.status}
+                          onChange={(e) => {
+                            const newStatus = e.target.value as CareerApplication['status'];
+                            handleStatusUpdate(selectedApplication._id, newStatus);
+                          }}
+                          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                          <option value="pending">Pending</option>
+                          <option value="reviewed">Reviewed</option>
+                          <option value="shortlisted">Shortlisted</option>
+                          <option value="rejected">Rejected</option>
+                          <option value="hired">Hired</option>
+                        </select>
+                        <button
+                          onClick={() => setShowModal(false)}
+                          className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                        >
+                          Close
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

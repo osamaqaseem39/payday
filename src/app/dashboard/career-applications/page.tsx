@@ -209,46 +209,88 @@ export default function CareerApplicationsPage() {
     }
   };
 
-  const createInterviewCandidate = async (applicationId: string) => {
+  const createMissingCandidates = async () => {
     try {
       setLoading(true);
       
-      // Call the interview candidates API to create a candidate
-      const response = await fetch(`${process.env.NEXT_PUBLIC_DASHBOARD_SERVER || 'http://localhost:3002'}/api/interview-candidates`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        },
-        body: JSON.stringify({ careerApplicationId: applicationId })
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to create candidate: ${response.status}`);
-      }
-
-      const result = await response.json();
+      // Find applications that don't have candidates yet
+      const applicationsWithoutCandidates = applications.filter(app => 
+        !interviewCandidates.some(candidate => 
+          candidate.careerApplication && 
+          (typeof candidate.careerApplication === 'string' ? 
+            candidate.careerApplication === app._id : 
+            candidate.careerApplication._id === app._id)
+        )
+      );
       
-      if (result.success) {
+      if (applicationsWithoutCandidates.length === 0) {
         setNotification({
           type: 'success',
-          message: 'Interview candidate created successfully!'
+          message: 'All applications already have candidates created! 🎉'
+        });
+        setTimeout(() => setNotification(null), 3000);
+        return;
+      }
+      
+      // Confirm with user
+      if (!confirm(`Create interview candidates for ${applicationsWithoutCandidates.length} applications? This will happen automatically.`)) {
+        return;
+      }
+      
+      let successCount = 0;
+      let errorCount = 0;
+      
+      // Create candidates for each application
+      for (const app of applicationsWithoutCandidates) {
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_DASHBOARD_SERVER || 'http://localhost:3002'}/api/interview-candidates`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+            },
+            body: JSON.stringify({ careerApplicationId: app._id })
+          });
+          
+          if (response.ok) {
+            successCount++;
+          } else {
+            errorCount++;
+          }
+        } catch (error) {
+          errorCount++;
+        }
+      }
+      
+      // Show results
+      if (successCount > 0) {
+        setNotification({
+          type: 'success',
+          message: `✅ Successfully created ${successCount} interview candidates${errorCount > 0 ? `, ${errorCount} failed` : ''}`
         });
         
-        // Refresh data to show the new candidate
-        fetchApplications();
+        // Refresh data to show new candidates
+        setTimeout(() => {
+          fetchApplications();
+        }, 1000);
       } else {
-        throw new Error(result.message || 'Failed to create candidate');
+        setNotification({
+          type: 'error',
+          message: `❌ Failed to create any candidates. Please check your connection.`
+        });
       }
-    } catch (error: any) {
-      console.error('Error creating interview candidate:', error);
+      
+      setTimeout(() => setNotification(null), 5000);
+      
+    } catch (error) {
+      console.error('Error creating candidates:', error);
       setNotification({
         type: 'error',
-        message: `Failed to create interview candidate: ${error.message}`
+        message: 'An error occurred while creating candidates'
       });
+      setTimeout(() => setNotification(null), 5000);
     } finally {
       setLoading(false);
-      setTimeout(() => setNotification(null), 5000);
     }
   };
 
@@ -339,58 +381,15 @@ export default function CareerApplicationsPage() {
                 <p className="text-gray-600">Review and manage job applications and interview candidates</p>
               </div>
               
-              {/* Bulk Actions */}
-              <div className="flex space-x-3">
-                <button
-                  onClick={async () => {
-                    const applicationsWithoutCandidates = applications.filter(app => 
-                      !interviewCandidates.some(candidate => 
-                        candidate.careerApplication && 
-                        (typeof candidate.careerApplication === 'string' ? 
-                          candidate.careerApplication === app._id : 
-                          candidate.careerApplication._id === app._id)
-                      )
-                    );
-                    
-                    if (applicationsWithoutCandidates.length === 0) {
-                      setNotification({
-                        type: 'success',
-                        message: 'All applications already have candidates created!'
-                      });
-                      setTimeout(() => setNotification(null), 3000);
-                      return;
-                    }
-                    
-                    if (confirm(`Create interview candidates for ${applicationsWithoutCandidates.length} applications?`)) {
-                      setLoading(true);
-                      let successCount = 0;
-                      let errorCount = 0;
-                      
-                      for (const app of applicationsWithoutCandidates) {
-                        try {
-                          await createInterviewCandidate(app._id);
-                          successCount++;
-                        } catch (error) {
-                          errorCount++;
-                        }
-                      }
-                      
-                      setNotification({
-                        type: successCount > 0 ? 'success' : 'error',
-                        message: `Created ${successCount} candidates${errorCount > 0 ? `, ${errorCount} failed` : ''}`
-                      });
-                      
-                      setTimeout(() => setNotification(null), 5000);
-                      fetchApplications();
-                    }
-                  }}
-                  disabled={loading}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <HiDocumentText className="h-4 w-4 mr-2" />
-                  {loading ? 'Creating...' : 'Create All Candidates'}
-                </button>
-              </div>
+              {/* Automation Button */}
+              <button
+                onClick={createMissingCandidates}
+                disabled={loading}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <HiDocumentText className="h-4 w-4 mr-2" />
+                {loading ? 'Creating...' : 'Create Missing Candidates'}
+              </button>
             </div>
 
             {/* Notification */}
@@ -439,6 +438,71 @@ export default function CareerApplicationsPage() {
                 </div>
               </div>
             )}
+
+            {/* Status Summary */}
+            <div className="bg-white shadow rounded-lg p-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">{applications.length}</div>
+                  <div className="text-sm text-gray-600">Total Applications</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">{interviewCandidates.length}</div>
+                  <div className="text-sm text-gray-600">Interview Candidates</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">
+                    {applications.filter(app => 
+                      interviewCandidates.some(candidate => 
+                        candidate.careerApplication && 
+                        (typeof candidate.careerApplication === 'string' ? 
+                          candidate.careerApplication === app._id : 
+                          candidate.careerApplication._id === app._id)
+                      )
+                    ).length}
+                  </div>
+                  <div className="text-sm text-gray-600">With Candidates</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-orange-600">
+                    {applications.filter(app => 
+                      !interviewCandidates.some(candidate => 
+                        candidate.careerApplication && 
+                        (typeof candidate.careerApplication === 'string' ? 
+                          candidate.careerApplication === app._id : 
+                          candidate.careerApplication._id === app._id)
+                      )
+                    ).length}
+                  </div>
+                  <div className="text-sm text-gray-600">Need Candidates</div>
+                </div>
+              </div>
+              
+              {/* Helpful Note */}
+              {applications.filter(app => 
+                !interviewCandidates.some(candidate => 
+                  candidate.careerApplication && 
+                  (typeof candidate.careerApplication === 'string' ? 
+                    candidate.careerApplication === app._id : 
+                    candidate.careerApplication._id === app._id)
+                )
+              ).length > 0 && (
+                <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-orange-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-orange-700">
+                        <strong>Some applications need interview candidates created.</strong> Use the "Create Missing Candidates" button above to automatically create candidates for all applications that need them.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Tabs */}
             <div className="border-b border-gray-200">
@@ -552,9 +616,13 @@ export default function CareerApplicationsPage() {
                               (typeof candidate.careerApplication === 'string' ? 
                                 candidate.careerApplication === application._id : 
                                 candidate.careerApplication._id === application._id)
-                            ) && (
+                            ) ? (
                               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                 ✅ Candidate Created
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                ⏳ Needs Candidate
                               </span>
                             )}
                           </div>
@@ -604,23 +672,6 @@ export default function CareerApplicationsPage() {
                           </button>
                           
                           <div className="flex space-x-2">
-                            {/* Create Interview Candidate Button - only show if candidate doesn't exist */}
-                            {!interviewCandidates.some(candidate => 
-                              candidate.careerApplication && 
-                              (typeof candidate.careerApplication === 'string' ? 
-                                candidate.careerApplication === application._id : 
-                                candidate.careerApplication._id === application._id)
-                            ) && (
-                              <button
-                                onClick={() => createInterviewCandidate(application._id)}
-                                disabled={loading}
-                                className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                              >
-                                <HiDocumentText className="h-4 w-4 mr-1" />
-                                {loading ? 'Creating...' : 'Create Candidate'}
-                              </button>
-                            )}
-                            
                             <a
                               href={application.resume?.url || application.resume?.path || '#'}
                               target="_blank"
@@ -682,7 +733,7 @@ export default function CareerApplicationsPage() {
                             {candidate.careerApplication?.phone && (
                               <div className="flex items-center space-x-2 mb-2">
                                 <HiPhone className="h-4 w-4 text-gray-400" />
-                                <p className="text-sm text-gray-500">{candidate.careerApplication.phone}</p>
+                                <div className="text-sm text-gray-500">{candidate.careerApplication.phone}</div>
                               </div>
                             )}
                             {candidate.careerApplication?.experience && (
@@ -843,9 +894,9 @@ export default function CareerApplicationsPage() {
                             </svg>
                           </div>
                           <div className="ml-3">
-                            <h4 className="text-sm font-medium text-blue-800">Automatic Candidate Creation</h4>
+                            <h4 className="text-sm font-medium text-blue-800">Interview Candidate Creation</h4>
                             <p className="text-sm text-blue-700">
-                              <strong>All applications automatically create interview candidates</strong> when submitted. You can now manage them directly from the Interview Candidates tab.
+                              <strong>New applications automatically create interview candidates.</strong> For existing applications, use the "Create Missing Candidates" button above to create candidates for all applications that need them.
                             </p>
                           </div>
                         </div>

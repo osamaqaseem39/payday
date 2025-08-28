@@ -1,5 +1,5 @@
 // Test script to check API endpoints
-const API_BASE = 'https://payday-new.vercel.app';
+const API_BASE = 'http://localhost:3002';
 
 async function testEndpoints() {
   console.log('🧪 Testing API endpoints...\n');

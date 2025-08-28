@@ -1,7 +1,7 @@
 // Website API Configuration
 const API_CONFIG = {
   // Dashboard server URL - change this for production
-  DASHBOARD_SERVER: process.env.NEXT_PUBLIC_DASHBOARD_SERVER || 'https://payday-new.vercel.app',
+  DASHBOARD_SERVER: process.env.NEXT_PUBLIC_DASHBOARD_SERVER || 'http://localhost:3002',
   
   // API endpoints
   ENDPOINTS: {

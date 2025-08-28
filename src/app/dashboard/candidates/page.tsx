@@ -104,11 +104,19 @@ export default function CandidatesPage() {
     }
   };
 
-  const filteredCandidates = candidates.filter(candidate => {
-    const matchesFilter = filter === 'all' || candidate.stage === filter;
-    const matchesSearch = candidate.candidateName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         candidate.jobTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         candidate.candidateEmail.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredCandidates = (candidates || []).filter(candidate => {
+    // Safely handle potentially undefined properties
+    if (!candidate) return false;
+    
+    const safeSearchTerm = searchTerm || '';
+    const candidateName = candidate.candidateName || '';
+    const jobTitle = candidate.jobTitle || '';
+    const candidateEmail = candidate.candidateEmail || '';
+    
+    const matchesFilter = filter === 'all' || (candidate.stage || '') === filter;
+    const matchesSearch = candidateName.toLowerCase().includes(safeSearchTerm.toLowerCase()) ||
+                         jobTitle.toLowerCase().includes(safeSearchTerm.toLowerCase()) ||
+                         candidateEmail.toLowerCase().includes(safeSearchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
@@ -172,61 +180,62 @@ export default function CandidatesPage() {
 
             {/* Candidates Grid */}
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
-              {filteredCandidates.map((candidate) => (
+              {(filteredCandidates || []).map((candidate) => (
+                candidate && (
                 <div key={candidate._id} className="bg-white shadow rounded-lg p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-medium text-gray-900 mb-1">{candidate.candidateName}</h3>
-                      <p className="text-sm text-gray-600 mb-2">{candidate.jobTitle}</p>
-                      <div className="flex items-center space-x-2 mb-2">
-                        <HiMail className="h-4 w-4 text-gray-400" />
-                        <p className="text-sm text-gray-500">{candidate.candidateEmail}</p>
-                      </div>
-                      {candidate.phoneNumber && (
-                        <div className="flex items-center space-x-2 mb-2">
-                          <HiPhone className="h-4 w-4 text-gray-400" />
-                          <p className="text-sm text-gray-500">{candidate.phoneNumber}</p>
+                                          <div className="flex items-start justify-between mb-4">
+                          <div className="flex-1">
+                            <h3 className="text-lg font-medium text-gray-900 mb-1">{candidate.candidateName || 'Unknown Candidate'}</h3>
+                            <p className="text-sm text-gray-600 mb-2">{candidate.jobTitle || 'Position not specified'}</p>
+                            <div className="flex items-center space-x-2 mb-2">
+                              <HiMail className="h-4 w-4 text-gray-400" />
+                              <p className="text-sm text-gray-500">{candidate.candidateEmail || 'Email not available'}</p>
+                            </div>
+                            {candidate.phoneNumber && (
+                              <div className="flex items-center space-x-2 mb-2">
+                                <HiPhone className="h-4 w-4 text-gray-400" />
+                                <p className="text-sm text-gray-500">{candidate.phoneNumber}</p>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex flex-col space-y-2">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStageColor(candidate.stage || 'screening')}`}>
+                              {(candidate.stage || 'screening').replace('-', ' ')}
+                            </span>
+                            {candidate.status && (
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(candidate.status)}`}>
+                                {candidate.status}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                      )}
-                    </div>
-                    <div className="flex flex-col space-y-2">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStageColor(candidate.stage)}`}>
-                        {candidate.stage.replace('-', ' ')}
-                      </span>
-                      {candidate.status && (
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(candidate.status)}`}>
-                          {candidate.status}
-                        </span>
-                      )}
-                    </div>
-                  </div>
                   
-                  <div className="space-y-2 mb-4">
-                    <div className="text-sm">
-                      <span className="font-medium text-gray-700">Experience:</span> {candidate.experience}
-                    </div>
-                    <div className="text-sm">
-                      <span className="font-medium text-gray-700">Education:</span> {candidate.education}
-                    </div>
-                    {candidate.scheduledDate && (
-                      <div className="text-sm">
-                        <span className="font-medium text-gray-700">Interview:</span> {new Date(candidate.scheduledDate).toLocaleDateString()}
-                      </div>
-                    )}
-                    {candidate.interviewerName && (
-                      <div className="text-sm">
-                        <span className="font-medium text-gray-700">Interviewer:</span> {candidate.interviewerName}
-                      </div>
-                    )}
-                  </div>
+                                          <div className="space-y-2 mb-4">
+                          <div className="text-sm">
+                            <span className="font-medium text-gray-700">Experience:</span> {candidate.experience || 'Not specified'}
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-medium text-gray-700">Education:</span> {candidate.education || 'Not specified'}
+                          </div>
+                          {candidate.scheduledDate && (
+                            <div className="text-sm">
+                              <span className="font-medium text-gray-700">Interview:</span> {new Date(candidate.scheduledDate).toLocaleDateString()}
+                            </div>
+                          )}
+                          {candidate.interviewerName && (
+                            <div className="text-sm">
+                              <span className="font-medium text-gray-700">Interviewer:</span> {candidate.interviewerName}
+                            </div>
+                          )}
+                        </div>
 
-                  {candidate.skills && candidate.skills.length > 0 && (
+                  {candidate.skills && Array.isArray(candidate.skills) && candidate.skills.length > 0 && (
                     <div className="mb-4">
                       <p className="text-sm font-medium text-gray-700 mb-2">Skills:</p>
                       <div className="flex flex-wrap gap-1">
                         {candidate.skills.slice(0, 3).map((skill, index) => (
                           <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            {skill}
+                            {skill || 'Unknown Skill'}
                           </span>
                         ))}
                         {candidate.skills.length > 3 && (
@@ -278,6 +287,7 @@ export default function CandidatesPage() {
                     </div>
                   </div>
                 </div>
+                )
               ))}
             </div>
 

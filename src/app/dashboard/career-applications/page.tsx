@@ -76,7 +76,6 @@ export default function CareerApplicationsPage() {
   // Check if user has admin or manager access
   useEffect(() => {
     if (user && (user.role !== 'admin' && user.role !== 'manager')) {
-      console.log('🚫 User does not have required access. Role:', user.role);
       window.location.href = '/dashboard';
       return;
     }
@@ -85,10 +84,8 @@ export default function CareerApplicationsPage() {
       // Check if we have a valid token before fetching
       const token = localStorage.getItem('authToken');
       if (token && token.trim() !== '') {
-        console.log('✅ User authenticated and authorized, fetching applications');
         fetchApplications();
       } else {
-        console.log('⚠️ No valid token found, redirecting to login');
         window.location.href = '/login';
       }
     }
@@ -267,11 +264,16 @@ export default function CareerApplicationsPage() {
     });
   };
 
-  const filteredApplications = applications.filter(application => {
+  const filteredApplications = (applications || []).filter(application => {
+    // Safely handle potentially undefined properties
+    if (!application) return false;
+    
+    const safeSearchTerm = searchTerm || '';
+    
     const matchesSearch = 
-      `${application.firstName || ''} ${application.lastName || ''}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (application.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (application.position || '').toLowerCase().includes(searchTerm.toLowerCase());
+      `${application.firstName || ''} ${application.lastName || ''}`.toLowerCase().includes(safeSearchTerm.toLowerCase()) ||
+      (application.email || '').toLowerCase().includes(safeSearchTerm.toLowerCase()) ||
+      (application.position || '').toLowerCase().includes(safeSearchTerm.toLowerCase());
     
     const matchesStatus = statusFilter === 'all' || (application.status || '') === statusFilter;
     const matchesPosition = positionFilter === 'all' || (application.position || '') === positionFilter;
@@ -279,7 +281,8 @@ export default function CareerApplicationsPage() {
     return matchesSearch && matchesStatus && matchesPosition;
   });
 
-  if (loading) {
+  // Additional safety check for data integrity
+  if (loading || !Array.isArray(applications) || !Array.isArray(interviewCandidates)) {
     return (
       <ProtectedRoute requiredRole="manager">
         <DashboardLayout>
@@ -287,6 +290,10 @@ export default function CareerApplicationsPage() {
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
               <p className="mt-4 text-gray-600">Loading applications and candidates...</p>
+              <p className="mt-2 text-sm text-gray-500">
+                Applications: {Array.isArray(applications) ? applications.length : 'Loading...'} | 
+                Candidates: {Array.isArray(interviewCandidates) ? interviewCandidates.length : 'Loading...'}
+              </p>
             </div>
           </div>
         </DashboardLayout>
@@ -438,7 +445,7 @@ export default function CareerApplicationsPage() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
-                    {filteredApplications.map((application) => (
+                    {(filteredApplications || []).map((application) => (
                       application && (
                       <div key={application._id} className="bg-white shadow rounded-lg p-6">
                         <div className="flex items-start justify-between mb-4">
@@ -540,7 +547,7 @@ export default function CareerApplicationsPage() {
             ) : (
               // Interview Candidates Tab
               <>
-                {interviewCandidates.length === 0 ? (
+                {!Array.isArray(interviewCandidates) || interviewCandidates.length === 0 ? (
                   <div className="bg-white shadow rounded-lg p-12 text-center">
                     <div className="text-gray-400 text-6xl mb-4">👥</div>
                     <h3 className="text-lg font-medium text-gray-900 mb-2">No interview candidates found</h3>
@@ -550,9 +557,9 @@ export default function CareerApplicationsPage() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
-                    {interviewCandidates.map((candidate) => (
-                      candidate && (
-                      <div key={candidate._id} className="bg-white shadow rounded-lg p-6">
+                        {(interviewCandidates || []).map((candidate) => (
+                          candidate && (
+                          <div key={candidate._id} className="bg-white shadow rounded-lg p-6">
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
                             <h3 className="text-lg font-medium text-gray-900 mb-1">

@@ -28,10 +28,11 @@ interface Candidate {
   email: string;
 }
 
-interface Job {
-  _id: string;
-  title: string;
-}
+// Jobs are not needed for interview scheduling
+// interface Job {
+//   _id: string;
+//   title: string;
+// }
 
 import DashboardLayout from '../../../components/DashboardLayout';
 import ProtectedRoute from '../../../components/ProtectedRoute';
@@ -39,7 +40,6 @@ import ProtectedRoute from '../../../components/ProtectedRoute';
 export default function InterviewsPage() {
   const [interviews, setInterviews] = useState<Interview[]>([]);
   const [candidates, setCandidates] = useState<Candidate[]>([]);
-  const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -48,19 +48,16 @@ export default function InterviewsPage() {
   const [editingInterview, setEditingInterview] = useState<Interview | null>(null);
   const [formData, setFormData] = useState({
     candidateId: '',
-    jobId: '',
     date: '',
     time: '',
     type: 'technical',
     interviewer: '',
-    status: 'scheduled',
     notes: ''
   });
 
   useEffect(() => {
     fetchInterviews();
     fetchCandidates();
-    fetchJobs();
   }, []);
 
   const fetchInterviews = async () => {
@@ -72,16 +69,22 @@ export default function InterviewsPage() {
         data.forEach((candidate: any) => {
           if (candidate.interviews && Array.isArray(candidate.interviews)) {
             candidate.interviews.forEach((interview: any) => {
+              const candidateName = candidate.careerApplication ? 
+                `${candidate.careerApplication.firstName || ''} ${candidate.careerApplication.lastName || ''}`.trim() || 'Unknown Candidate' : 
+                'Unknown Candidate';
+              const candidateEmail = candidate.careerApplication?.email || 'No email available';
+              const jobTitle = candidate.careerApplication?.position || 'Position not specified';
+              
               allInterviews.push({
                 _id: interview._id || `${candidate._id}-${interview.scheduledAt}`,
                 candidateId: {
                   _id: candidate._id,
-                  name: candidate.candidateName,
-                  email: candidate.candidateEmail
+                  name: candidateName,
+                  email: candidateEmail
                 },
                 jobId: {
-                  _id: candidate.jobId,
-                  title: candidate.jobTitle
+                  _id: candidate.careerApplication?._id || candidate._id,
+                  title: jobTitle
                 },
                 date: interview.scheduledAt,
                 type: interview.type || 'technical',
@@ -111,8 +114,10 @@ export default function InterviewsPage() {
       if (Array.isArray(data)) {
         setCandidates(data.map((candidate: any) => ({
           _id: candidate._id,
-          name: candidate.candidateName,
-          email: candidate.candidateEmail
+          name: candidate.careerApplication ? 
+            `${candidate.careerApplication.firstName || ''} ${candidate.careerApplication.lastName || ''}`.trim() || 'Unknown Candidate' : 
+            'Unknown Candidate',
+          email: candidate.careerApplication?.email || 'No email available'
         })));
       }
     } catch (error) {
@@ -120,50 +125,49 @@ export default function InterviewsPage() {
     }
   };
 
-  const fetchJobs = async () => {
-    try {
-      const data = await dashboardApi.jobs.list();
-      if (Array.isArray(data)) {
-        setJobs(data);
-      }
-    } catch (error) {
-      console.error('Error fetching jobs:', error);
-    }
-  };
+  // Jobs are not needed for interview scheduling since interviews are scheduled for candidates
+  // const fetchJobs = async () => { ... };
 
   const handleCreateInterview = async (interviewData: any) => {
     try {
-      // Since interviews are part of candidates, we need to add the interview to the candidate
       const candidateId = interviewData.candidateId;
-      const interviewToAdd = {
-        scheduledAt: `${interviewData.date}T${interviewData.time}`,
-        type: interviewData.type,
-        interviewer: interviewData.interviewer,
-        status: interviewData.status,
-        notes: interviewData.notes
+      
+      // Transform form data to match API expectations
+      const interviewToSchedule = {
+        stage: interviewData.type, // Map type to stage
+        scheduledAt: `${interviewData.date}T${interviewData.time}:00.000Z`,
+        interviewers: [interviewData.interviewer], // Convert to array
+        duration: 60, // Default duration
+        location: 'TBD', // Default location
+        notes: interviewData.notes || ''
       };
       
-      // This would need to be implemented on the server side
-      // For now, we'll just refresh the data
+      // Call the API to schedule the interview
+      await dashboardApi.interviewCandidates.scheduleInterview(candidateId, interviewToSchedule);
+      
+      // Refresh data and close modal
       await fetchInterviews();
       setShowModal(false);
       resetForm();
     } catch (error) {
       console.error('Error creating interview:', error);
+      alert('Failed to schedule interview. Please try again.');
     }
   };
 
   const handleUpdateInterview = async (id: string, interviewData: any) => {
     try {
-      // Since interviews are part of candidates, we need to update the interview within the candidate
-      // This would need to be implemented on the server side
-      // For now, we'll just refresh the data
+      // For now, we'll just refresh the data since updating individual interviews
+      // would require more complex backend implementation
+      // TODO: Implement interview update functionality
+      console.log('Interview update not yet implemented');
       await fetchInterviews();
       setShowModal(false);
       setEditingInterview(null);
       resetForm();
     } catch (error) {
       console.error('Error updating interview:', error);
+      alert('Failed to update interview. Please try again.');
     }
   };
 
@@ -183,12 +187,10 @@ export default function InterviewsPage() {
   const resetForm = () => {
     setFormData({
       candidateId: '',
-      jobId: '',
       date: '',
       time: '',
       type: 'technical',
       interviewer: '',
-      status: 'scheduled',
       notes: ''
     });
   };
@@ -198,12 +200,10 @@ export default function InterviewsPage() {
     const interviewDate = new Date(interview.date);
     setFormData({
       candidateId: interview.candidateId._id,
-      jobId: interview.jobId._id,
       date: interviewDate.toISOString().split('T')[0],
       time: interviewDate.toTimeString().split(' ')[0].substring(0, 5),
       type: interview.type,
       interviewer: interview.interviewer,
-      status: interview.status,
       notes: interview.notes
     });
     setShowModal(true);
@@ -486,22 +486,6 @@ export default function InterviewsPage() {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Job Position *</label>
-                        <select
-                          value={formData.jobId}
-                          onChange={(e) => setFormData({ ...formData, jobId: e.target.value })}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                          required
-                        >
-                          <option value="">Select Job</option>
-                          {jobs.map((job) => (
-                            <option key={job._id} value={job._id}>
-                              {job.title}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
                         <label className="block text-sm font-medium text-gray-700">Interview Date *</label>
                         <input
                           type="date"
@@ -544,20 +528,6 @@ export default function InterviewsPage() {
                           required
                         />
                       </div>
-                    </div>
-
-                    {/* Status */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Status</label>
-                      <select
-                        value={formData.status}
-                        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                      >
-                        <option value="scheduled">Scheduled</option>
-                        <option value="completed">Completed</option>
-                        <option value="cancelled">Cancelled</option>
-                      </select>
                     </div>
 
                     {/* Notes */}

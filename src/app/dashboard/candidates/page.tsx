@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { HiEye, HiCalendar, HiPhone, HiMail, HiSearch, HiUser, HiAcademicCap, HiBriefcase, HiDocumentText } from 'react-icons/hi';
+import { HiEye, HiCalendar, HiPhone, HiMail, HiSearch, HiUser, HiAcademicCap, HiBriefcase, HiDocumentText, HiX } from 'react-icons/hi';
 import { dashboardApi } from '../../../config/api';
 
 interface CareerApplication {
@@ -66,6 +66,17 @@ export default function CandidatesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCandidate, setSelectedCandidate] = useState<InterviewCandidate | null>(null);
   const [showModal, setShowModal] = useState(false);
+  
+  // Interview scheduling state
+  const [showInterviewModal, setShowInterviewModal] = useState(false);
+  const [selectedCandidateForInterview, setSelectedCandidateForInterview] = useState<InterviewCandidate | null>(null);
+  const [interviewFormData, setInterviewFormData] = useState({
+    date: '',
+    time: '',
+    type: 'phone-interview',
+    interviewer: '',
+    notes: ''
+  });
 
   useEffect(() => {
     fetchCandidates();
@@ -111,17 +122,97 @@ export default function CandidatesPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'scheduled':
-        return 'bg-green-100 text-green-800';
-      case 'completed':
-        return 'bg-blue-100 text-blue-800';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800';
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
+      case 'reviewed':
+        return 'bg-blue-100 text-blue-800';
+      case 'shortlisted':
+        return 'bg-green-100 text-green-800';
+      case 'rejected':
+        return 'bg-red-100 text-red-800';
+      case 'hired':
+        return 'bg-green-100 text-green-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  const handleScheduleInterview = (candidate: InterviewCandidate) => {
+    setSelectedCandidateForInterview(candidate);
+    setInterviewFormData({
+      date: '',
+      time: '',
+      type: candidate.currentStage === 'screening' ? 'phone-interview' : 
+            candidate.currentStage === 'phone-interview' ? 'technical-interview' : 'final-interview',
+      interviewer: '',
+      notes: ''
+    });
+    setShowInterviewModal(true);
+  };
+
+  const handleInterviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!selectedCandidateForInterview) return;
+
+    try {
+      // Ensure date and time are set
+      if (!interviewFormData.date || !interviewFormData.time) {
+        alert('Please select both date and time for the interview.');
+        return;
+      }
+
+      // Create a proper ISO string for the scheduled time
+      const scheduledDateTime = new Date(`${interviewFormData.date}T${interviewFormData.time}:00.000Z`);
+      
+      // Validate that the interview is in the future
+      if (scheduledDateTime <= new Date()) {
+        alert('Interview must be scheduled in the future.');
+        return;
+      }
+
+      const interviewData = {
+        stage: interviewFormData.type,
+        scheduledAt: scheduledDateTime.toISOString(),
+        interviewers: [interviewFormData.interviewer],
+        duration: 60,
+        location: 'TBD',
+        notes: interviewFormData.notes || ''
+      };
+
+      console.log('Scheduling interview with data:', interviewData);
+
+      await dashboardApi.interviewCandidates.scheduleInterview(selectedCandidateForInterview._id, interviewData);
+      
+      // Refresh candidates list
+      await fetchCandidates();
+      
+      // Close modal and reset form
+      setShowInterviewModal(false);
+      setSelectedCandidateForInterview(null);
+      setInterviewFormData({
+        date: '',
+        time: '',
+        type: 'phone-interview',
+        interviewer: '',
+        notes: ''
+      });
+      
+      alert('Interview scheduled successfully!');
+    } catch (error) {
+      console.error('Error scheduling interview:', error);
+      alert('Failed to schedule interview. Please try again.');
+    }
+  };
+
+  const resetInterviewForm = () => {
+    setInterviewFormData({
+      date: '',
+      time: '',
+      type: 'phone-interview',
+      interviewer: '',
+      notes: ''
+    });
   };
 
   const filteredCandidates = (candidates || []).filter(candidate => {
@@ -303,25 +394,37 @@ export default function CandidatesPage() {
                     
                     <div className="flex space-x-2">
                       {candidate.currentStage === 'screening' && (
-                        <button className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <button 
+                          onClick={() => handleScheduleInterview(candidate)}
+                          className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
                           <HiCalendar className="h-4 w-4 mr-1" />
                           Schedule Interview
                         </button>
                       )}
                       {candidate.currentStage === 'phone-interview' && (
-                        <button className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                        <button 
+                          onClick={() => handleScheduleInterview(candidate)}
+                          className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                        >
                           <HiAcademicCap className="h-4 w-4 mr-1" />
                           Technical Round
                         </button>
                       )}
                       {candidate.currentStage === 'technical-interview' && (
-                        <button className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <button 
+                          onClick={() => handleScheduleInterview(candidate)}
+                          className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
                           <HiUser className="h-4 w-4 mr-1" />
                           Final Round
                         </button>
                       )}
                       {candidate.currentStage === 'final-interview' && (
-                        <button className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        <button 
+                          onClick={() => handleScheduleInterview(candidate)}
+                          className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                        >
                           <HiBriefcase className="h-4 w-4 mr-1" />
                           Make Offer
                         </button>
@@ -570,6 +673,103 @@ export default function CandidatesPage() {
                       </button>
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Interview Scheduling Modal */}
+          {showInterviewModal && selectedCandidateForInterview && (
+            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+              <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+                <div className="mt-3">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-medium text-gray-900">
+                      Schedule Interview for {selectedCandidateForInterview.careerApplication.firstName} {selectedCandidateForInterview.careerApplication.lastName}
+                    </h3>
+                    <button
+                      onClick={() => setShowInterviewModal(false)}
+                      className="text-gray-400 hover:text-gray-600"
+                    >
+                      <HiX className="h-6 w-6" />
+                    </button>
+                  </div>
+
+                                     <form onSubmit={handleInterviewSubmit} className="space-y-4">
+                     <div>
+                       <label className="block text-sm font-medium text-gray-700">Interview Type *</label>
+                       <select
+                         value={interviewFormData.type}
+                         onChange={(e) => setInterviewFormData({ ...interviewFormData, type: e.target.value })}
+                         className="block w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                         required
+                       >
+                         <option value="phone-interview">Phone Interview</option>
+                         <option value="technical-interview">Technical Interview</option>
+                         <option value="final-interview">Final Interview</option>
+                       </select>
+                     </div>
+                     <div>
+                       <label className="block text-sm font-medium text-gray-700">Date *</label>
+                       <input
+                         type="date"
+                         value={interviewFormData.date}
+                         onChange={(e) => setInterviewFormData({ ...interviewFormData, date: e.target.value })}
+                         className="block w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                         required
+                       />
+                     </div>
+                     <div>
+                       <label className="block text-sm font-medium text-gray-700">Time *</label>
+                       <input
+                         type="time"
+                         value={interviewFormData.time}
+                         onChange={(e) => setInterviewFormData({ ...interviewFormData, time: e.target.value })}
+                         className="block w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                         required
+                       />
+                     </div>
+                     <div>
+                       <label className="block text-sm font-medium text-gray-700">Interviewer *</label>
+                       <input
+                         type="text"
+                         value={interviewFormData.interviewer}
+                         onChange={(e) => setInterviewFormData({ ...interviewFormData, interviewer: e.target.value })}
+                         className="block w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                         placeholder="Enter interviewer name"
+                         required
+                       />
+                     </div>
+                     <div>
+                       <label className="block text-sm font-medium text-gray-700">Notes</label>
+                       <textarea
+                         value={interviewFormData.notes}
+                         onChange={(e) => setInterviewFormData({ ...interviewFormData, notes: e.target.value })}
+                         rows={3}
+                         className="block w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                         placeholder="Enter interview notes or instructions..."
+                       />
+                     </div>
+                     <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                       <button
+                         type="button"
+                         onClick={() => {
+                           setShowInterviewModal(false);
+                           setSelectedCandidateForInterview(null);
+                           resetInterviewForm();
+                         }}
+                         className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                       >
+                         Cancel
+                       </button>
+                       <button
+                         type="submit"
+                         className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700"
+                       >
+                         Schedule Interview
+                       </button>
+                     </div>
+                   </form>
                 </div>
               </div>
             </div>

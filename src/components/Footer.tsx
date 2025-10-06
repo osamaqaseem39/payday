@@ -69,6 +69,31 @@ export default function Footer() {
                   Careers
                 </Link>
               </li>
+              <li>
+                <Link href="/testimonials" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  Testimonials
+                </Link>
+              </li>
+              <li>
+                <Link href="/team" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  Our Team
+                </Link>
+              </li>
+              <li>
+                <Link href="/blog" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  Blog
+                </Link>
+              </li>
+              <li>
+                <Link href="/news" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  News
+                </Link>
+              </li>
+              <li>
+                <Link href="/feedback" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  Feedback
+                </Link>
+              </li>
             </ul>
           </div>
 

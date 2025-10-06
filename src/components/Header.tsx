@@ -154,6 +154,26 @@ export default function Header() {
             <Link href="/career" className="text-gray-900 hover:text-gray-600 transition-colors font-medium">
               Career
             </Link>
+            
+            <Link href="/testimonials" className="text-gray-900 hover:text-gray-600 transition-colors font-medium">
+              Testimonials
+            </Link>
+            
+            <Link href="/team" className="text-gray-900 hover:text-gray-600 transition-colors font-medium">
+              Team
+            </Link>
+            
+            <Link href="/blog" className="text-gray-900 hover:text-gray-600 transition-colors font-medium">
+              Blog
+            </Link>
+            
+            <Link href="/news" className="text-gray-900 hover:text-gray-600 transition-colors font-medium">
+              News
+            </Link>
+            
+            <Link href="/feedback" className="text-gray-900 hover:text-gray-600 transition-colors font-medium">
+              Feedback
+            </Link>
           </nav>
 
           {/* CTA Buttons */}
@@ -180,6 +200,12 @@ export default function Header() {
                   className="bg-white text-gray-900 px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors font-medium"
                 >
                   Sign in
+                </Link>
+                <Link
+                  href="/candidate-login"
+                  className="bg-blue-50 text-blue-600 px-6 py-2 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors font-medium"
+                >
+                  Candidate Login
                 </Link>
                 <Link
                   href="/apply"
@@ -362,6 +388,46 @@ export default function Header() {
                 Career
               </Link>
               
+              <Link
+                href="/testimonials"
+                className="block px-3 py-2 text-gray-900 hover:text-gray-600 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Testimonials
+              </Link>
+              
+              <Link
+                href="/team"
+                className="block px-3 py-2 text-gray-900 hover:text-gray-600 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Team
+              </Link>
+              
+              <Link
+                href="/blog"
+                className="block px-3 py-2 text-gray-900 hover:text-gray-600 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Blog
+              </Link>
+              
+              <Link
+                href="/news"
+                className="block px-3 py-2 text-gray-900 hover:text-gray-600 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                News
+              </Link>
+              
+              <Link
+                href="/feedback"
+                className="block px-3 py-2 text-gray-900 hover:text-gray-600 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Feedback
+              </Link>
+              
               <div className="px-3 py-2 space-y-2">
                 {isAuthenticated ? (
                   <>
@@ -390,6 +456,13 @@ export default function Header() {
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Sign in
+                    </Link>
+                    <Link
+                      href="/candidate-login"
+                      className="block bg-blue-50 text-blue-600 px-6 py-2 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors text-center"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Candidate Login
                     </Link>
                     <Link
                       href="/apply"

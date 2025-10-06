@@ -7,6 +7,13 @@ import Features from '@/components/Features';
 import HowItWorks from '@/components/HowItWorks';
 import LoanCalculator from '@/components/LoanCalculator';
 import ApplicationForm from '@/components/ApplicationForm';
+import Testimonials from '@/components/Testimonials';
+import Feedback from '@/components/Feedback';
+import Team from '@/components/Team';
+import YouTubeDemo from '@/components/YouTubeDemo';
+import Blog from '@/components/Blog';
+import News from '@/components/News';
+import EmailSignup from '@/components/EmailSignup';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 
@@ -25,7 +32,7 @@ export default function Home() {
   }, []);
 
                 return (
-                <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 pt-16">
+                <main className="min-h-screen bg-white pt-16">
       {/* Scroll Progress Indicator */}
       <div 
         className="scroll-indicator" 
@@ -34,11 +41,17 @@ export default function Home() {
       
       <Header />
       <Hero /> 
-         <HowItWorks />
+      <HowItWorks />
       <Features />
-  
+      <Testimonials />
+      <YouTubeDemo />
+      <Team />
+      <Blog />
+      <News />
       <LoanCalculator />
       <ApplicationForm />
+      <Feedback />
+      <EmailSignup />
       <Contact />
       <Footer />
     </main>

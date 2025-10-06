@@ -17,7 +17,13 @@ import {
   HiBell,
   HiUserCircle,
   HiLogout,
-  HiShieldCheck
+  HiShieldCheck,
+  HiStar,
+  HiChatAlt,
+  HiUserGroup,
+  HiNewspaper,
+  HiMail,
+  HiBookOpen
 } from 'react-icons/hi';
 
 const navigation = [
@@ -26,6 +32,20 @@ const navigation = [
   { name: 'Jobs', href: '/dashboard/jobs', icon: HiBriefcase },
   { name: 'Candidates', href: '/dashboard/candidates', icon: HiUsers },
   { name: 'Interviews', href: '/dashboard/interviews', icon: HiCalendar },
+];
+
+const contentManagement = [
+  { name: 'Testimonials', href: '/dashboard/testimonials', icon: HiStar },
+  { name: 'Feedback', href: '/dashboard/feedback', icon: HiChatAlt },
+  { name: 'Team Members', href: '/dashboard/team', icon: HiUserGroup },
+  { name: 'Blog Posts', href: '/dashboard/blog', icon: HiBookOpen },
+  { name: 'News Articles', href: '/dashboard/news', icon: HiNewspaper },
+  { name: 'Email Subscriptions', href: '/dashboard/email-subscriptions', icon: HiMail },
+];
+
+const candidateNavigation = [
+  { name: 'My Profile', href: '/dashboard/candidate', icon: HiUserCircle },
+  { name: 'Browse Jobs', href: '/career', icon: HiBriefcase },
 ];
 
 interface DashboardLayoutProps {
@@ -66,28 +86,87 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </div>
           </div>
           <nav className="flex-1 space-y-1 px-2 py-4">
-            {navigation.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  onClick={() => setSidebarOpen(false)}
-                  className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors ${
-                    isActive
-                      ? 'bg-blue-100 text-blue-900'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
-                >
-                  <item.icon
-                    className={`mr-3 h-5 w-5 flex-shrink-0 ${
-                      isActive ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-500'
+            {/* Show different navigation based on user role */}
+            {(user?.role === 'admin' || user?.role === 'manager') ? (
+              <>
+                {/* Main Navigation */}
+                {navigation.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setSidebarOpen(false)}
+                      className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors ${
+                        isActive
+                          ? 'bg-blue-100 text-blue-900'
+                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      }`}
+                    >
+                      <item.icon
+                        className={`mr-3 h-5 w-5 flex-shrink-0 ${
+                          isActive ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-500'
+                        }`}
+                      />
+                      {item.name}
+                    </Link>
+                  );
+                })}
+                
+                {/* Content Management Section */}
+                <div className="pt-4">
+                  <div className="px-2 py-1">
+                    <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Content Management</h3>
+                  </div>
+                  {contentManagement.map((item) => {
+                    const isActive = pathname === item.href;
+                    return (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        onClick={() => setSidebarOpen(false)}
+                        className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors ${
+                          isActive
+                            ? 'bg-green-100 text-green-900'
+                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        }`}
+                      >
+                        <item.icon
+                          className={`mr-3 h-5 w-5 flex-shrink-0 ${
+                            isActive ? 'text-green-500' : 'text-gray-400 group-hover:text-gray-500'
+                          }`}
+                        />
+                        {item.name}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              // Candidate navigation
+              candidateNavigation.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    onClick={() => setSidebarOpen(false)}
+                    className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors ${
+                      isActive
+                        ? 'bg-blue-100 text-blue-900'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                     }`}
-                  />
-                  {item.name}
-                </Link>
-              );
-            })}
+                  >
+                    <item.icon
+                      className={`mr-3 h-5 w-5 flex-shrink-0 ${
+                        isActive ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-500'
+                      }`}
+                    />
+                    {item.name}
+                  </Link>
+                );
+              })
+            )}
             
             {/* Admin Navigation - Only visible to admins */}
             {user?.role === 'admin' && (
@@ -119,27 +198,84 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <h1 className="text-xl font-bold text-blue-600">Payday Careers</h1>
           </div>
           <nav className="flex-1 space-y-1 px-2 py-4">
-            {navigation.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors ${
-                    isActive
-                      ? 'bg-blue-100 text-blue-900'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
-                >
-                  <item.icon
-                    className={`mr-3 h-5 w-5 flex-shrink-0 ${
-                      isActive ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-500'
+            {/* Show different navigation based on user role */}
+            {(user?.role === 'admin' || user?.role === 'manager') ? (
+              <>
+                {/* Main Navigation */}
+                {navigation.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors ${
+                        isActive
+                          ? 'bg-blue-100 text-blue-900'
+                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      }`}
+                    >
+                      <item.icon
+                        className={`mr-3 h-5 w-5 flex-shrink-0 ${
+                          isActive ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-500'
+                        }`}
+                      />
+                      {item.name}
+                    </Link>
+                  );
+                })}
+                
+                {/* Content Management Section */}
+                <div className="pt-4">
+                  <div className="px-2 py-1">
+                    <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Content Management</h3>
+                  </div>
+                  {contentManagement.map((item) => {
+                    const isActive = pathname === item.href;
+                    return (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors ${
+                          isActive
+                            ? 'bg-green-100 text-green-900'
+                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        }`}
+                      >
+                        <item.icon
+                          className={`mr-3 h-5 w-5 flex-shrink-0 ${
+                            isActive ? 'text-green-500' : 'text-gray-400 group-hover:text-gray-500'
+                          }`}
+                        />
+                        {item.name}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              // Candidate navigation
+              candidateNavigation.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors ${
+                      isActive
+                        ? 'bg-blue-100 text-blue-900'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                     }`}
-                  />
-                  {item.name}
-                </Link>
-              );
-            })}
+                  >
+                    <item.icon
+                      className={`mr-3 h-5 w-5 flex-shrink-0 ${
+                        isActive ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-500'
+                      }`}
+                    />
+                    {item.name}
+                  </Link>
+                );
+              })
+            )}
             
             {/* Admin Navigation - Only visible to admins */}
             {user?.role === 'admin' && (

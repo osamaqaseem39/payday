@@ -53,6 +53,7 @@ const API_CONFIG = {
         UPCOMING_INTERVIEWS: '/api/interview-candidates/upcoming-interviews',
         BY_INTERVIEWER: '/api/interview-candidates/interviewer/:interviewerId',
         BY_STAGE: '/api/interview-candidates/stage/:stage',
+        BY_EMAIL: '/api/interview-candidates/email/:email',
         SCHEDULE_INTERVIEW: '/api/interview-candidates/:id/schedule-interview',
         MAKE_DECISION: '/api/interview-candidates/:id/decision',
         ADD_COMMUNICATION: '/api/interview-candidates/:id/communication',
@@ -462,6 +463,13 @@ export const dashboardApi = {
     
     getByStage: async (stage: string) => {
       const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.INTERVIEW_CANDIDATES.BY_STAGE, { stage }), {
+        headers: getAuthHeaders()
+      });
+      return handleApiResponse(response);
+    },
+    
+    getByEmail: async (email: string) => {
+      const response = await fetch(getDashboardApiUrl(API_CONFIG.ENDPOINTS.DASHBOARD.INTERVIEW_CANDIDATES.BY_EMAIL, { email }), {
         headers: getAuthHeaders()
       });
       return handleApiResponse(response);

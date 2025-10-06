@@ -94,6 +94,12 @@ export default function CareerApplicationForm({ jobId, jobTitle }: CareerApplica
         const successData = await response.json();
         console.log('✅ Success response:', successData);
         setSubmitStatus('success');
+        
+        // Store user email for candidate dashboard access
+        localStorage.setItem('userEmail', formData.email);
+        sessionStorage.setItem('userEmail', formData.email);
+        
+        // Reset form
         setFormData({
           firstName: '',
           lastName: '',
@@ -104,6 +110,13 @@ export default function CareerApplicationForm({ jobId, jobTitle }: CareerApplica
           coverLetter: '',
           resume: null,
         });
+        
+        // Show success message with link to candidate dashboard
+        setTimeout(() => {
+          if (window.confirm('Application submitted successfully! Would you like to view your candidate dashboard?')) {
+            window.location.href = '/dashboard/candidate';
+          }
+        }, 2000);
       } else {
         const errorData = await response.json();
         console.log('❌ Error response:', errorData);
@@ -134,6 +147,14 @@ export default function CareerApplicationForm({ jobId, jobTitle }: CareerApplica
             <div>
               <h3 className="font-semibold text-green-800">Application Submitted!</h3>
               <p className="text-green-700">Thank you for your interest. We'll review your application and get back to you soon.</p>
+              <div className="mt-3">
+                <a
+                  href="/dashboard/candidate"
+                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  View My Candidate Dashboard
+                </a>
+              </div>
             </div>
           </div>
         </div>

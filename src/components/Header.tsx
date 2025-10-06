@@ -11,6 +11,7 @@ export default function Header() {
   const [isLoansDropdownOpen, setIsLoansDropdownOpen] = useState(false);
   const [isPaydayExpressDropdownOpen, setIsPaydayExpressDropdownOpen] = useState(false);
   const [isLendingTypesDropdownOpen, setIsLendingTypesDropdownOpen] = useState(false);
+  const [isExploreDropdownOpen, setIsExploreDropdownOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
@@ -151,29 +152,42 @@ export default function Header() {
               )}
             </div>
             
-            <Link href="/career" className="text-gray-900 hover:text-gray-600 transition-colors font-medium">
-              Career
-            </Link>
-            
-            <Link href="/testimonials" className="text-gray-900 hover:text-gray-600 transition-colors font-medium">
-              Testimonials
-            </Link>
-            
-            <Link href="/team" className="text-gray-900 hover:text-gray-600 transition-colors font-medium">
-              Team
-            </Link>
-            
-            <Link href="/blog" className="text-gray-900 hover:text-gray-600 transition-colors font-medium">
-              Blog
-            </Link>
-            
-            <Link href="/news" className="text-gray-900 hover:text-gray-600 transition-colors font-medium">
-              News
-            </Link>
-            
-            <Link href="/feedback" className="text-gray-900 hover:text-gray-600 transition-colors font-medium">
-              Feedback
-            </Link>
+            {/* Explore Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setIsExploreDropdownOpen(!isExploreDropdownOpen)}
+                className="text-gray-900 hover:text-gray-600 transition-colors font-medium flex items-center"
+              >
+                Explore
+                <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {isExploreDropdownOpen && (
+                <div className="absolute top-full left-0 mt-2 w-52 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <div className="py-2">
+                    <Link href="/testimonials" className="block px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors">
+                      Testimonials
+                    </Link>
+                    <Link href="/team" className="block px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors">
+                      Team
+                    </Link>
+                    <Link href="/blog" className="block px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors">
+                      Blog
+                    </Link>
+                    <Link href="/news" className="block px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors">
+                      News
+                    </Link>
+                    <Link href="/feedback" className="block px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors">
+                      Feedback
+                    </Link>
+                    <Link href="/career" className="block px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors">
+                      Career
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
           </nav>
 
           {/* CTA Buttons */}
@@ -380,53 +394,54 @@ export default function Header() {
                 </div>
               </div>
               
-              <Link
-                href="/career"
-                className="block px-3 py-2 text-gray-900 hover:text-gray-600 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Career
-              </Link>
-              
-              <Link
-                href="/testimonials"
-                className="block px-3 py-2 text-gray-900 hover:text-gray-600 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Testimonials
-              </Link>
-              
-              <Link
-                href="/team"
-                className="block px-3 py-2 text-gray-900 hover:text-gray-600 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Team
-              </Link>
-              
-              <Link
-                href="/blog"
-                className="block px-3 py-2 text-gray-900 hover:text-gray-600 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Blog
-              </Link>
-              
-              <Link
-                href="/news"
-                className="block px-3 py-2 text-gray-900 hover:text-gray-600 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                News
-              </Link>
-              
-              <Link
-                href="/feedback"
-                className="block px-3 py-2 text-gray-900 hover:text-gray-600 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Feedback
-              </Link>
+              {/* Mobile Explore Section */}
+              <div className="px-3 py-2">
+                <div className="text-gray-900 font-medium mb-2">Explore</div>
+                <div className="pl-4 space-y-1">
+                  <Link
+                    href="/testimonials"
+                    className="block py-1 text-gray-700 hover:text-gray-900 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Testimonials
+                  </Link>
+                  <Link
+                    href="/team"
+                    className="block py-1 text-gray-700 hover:text-gray-900 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Team
+                  </Link>
+                  <Link
+                    href="/blog"
+                    className="block py-1 text-gray-700 hover:text-gray-900 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Blog
+                  </Link>
+                  <Link
+                    href="/news"
+                    className="block py-1 text-gray-700 hover:text-gray-900 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    News
+                  </Link>
+                  <Link
+                    href="/feedback"
+                    className="block py-1 text-gray-700 hover:text-gray-900 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Feedback
+                  </Link>
+                  <Link
+                    href="/career"
+                    className="block py-1 text-gray-700 hover:text-gray-900 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Career
+                  </Link>
+                </div>
+              </div>
               
               <div className="px-3 py-2 space-y-2">
                 {isAuthenticated ? (
@@ -496,6 +511,12 @@ export default function Header() {
         <div 
           className="fixed inset-0 z-40" 
           onClick={() => setIsLendingTypesDropdownOpen(false)}
+        />
+      )}
+      {isExploreDropdownOpen && (
+        <div 
+          className="fixed inset-0 z-40" 
+          onClick={() => setIsExploreDropdownOpen(false)}
         />
       )}
     </header>

@@ -165,7 +165,7 @@ export default function TestimonialsPage() {
         <DashboardLayout>
           <div className="min-h-screen bg-gray-50 flex items-center justify-center">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto"></div>
               <p className="mt-4 text-gray-600">Loading testimonials...</p>
             </div>
           </div>
@@ -187,7 +187,7 @@ export default function TestimonialsPage() {
               </div>
               <button
                 onClick={() => setShowForm(true)}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-amber-600 hover:bg-amber-700"
               >
                 <HiPlus className="h-4 w-4 mr-2" />
                 Add Testimonial
@@ -197,7 +197,7 @@ export default function TestimonialsPage() {
             {/* Form Modal */}
             {showForm && (
               <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-                <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                <div className="relative top-20 mx-auto p-5 border-t-4 border-amber-500 w-96 shadow-lg rounded-md bg-white">
                   <div className="mt-3">
                     <h3 className="text-lg font-medium text-gray-900 mb-4">
                       {editingTestimonial ? 'Edit Testimonial' : 'Add New Testimonial'}
@@ -299,7 +299,7 @@ export default function TestimonialsPage() {
                         </button>
                         <button
                           type="submit"
-                          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+                          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-amber-600 hover:bg-amber-700"
                         >
                           {editingTestimonial ? 'Update' : 'Create'}
                         </button>
@@ -318,8 +318,8 @@ export default function TestimonialsPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <div className="flex-shrink-0">
-                          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                            <span className="text-blue-600 font-medium">
+                          <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center">
+                            <span className="text-amber-700 font-medium">
                               {testimonial.name.charAt(0)}
                             </span>
                           </div>
@@ -374,7 +374,7 @@ export default function TestimonialsPage() {
                           )}
                           <button
                             onClick={() => handleEdit(testimonial)}
-                            className="text-blue-600 hover:text-blue-900"
+                            className="text-amber-600 hover:text-amber-800"
                             title="Edit"
                           >
                             <HiPencil className="h-4 w-4" />

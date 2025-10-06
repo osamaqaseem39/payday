@@ -145,7 +145,7 @@ export default function FeedbackPage() {
         <DashboardLayout>
           <div className="min-h-screen bg-gray-50 flex items-center justify-center">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-600 mx-auto"></div>
               <p className="mt-4 text-gray-600">Loading feedback...</p>
             </div>
           </div>
@@ -167,7 +167,7 @@ export default function FeedbackPage() {
               </div>
               <button
                 onClick={() => setShowForm(true)}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-rose-600 hover:bg-rose-700"
               >
                 <HiPlus className="h-4 w-4 mr-2" />
                 Add Feedback
@@ -177,7 +177,7 @@ export default function FeedbackPage() {
             {/* Form Modal */}
             {showForm && (
               <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-                <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                <div className="relative top-20 mx-auto p-5 border-t-4 border-rose-500 w-96 shadow-lg rounded-md bg-white">
                   <div className="mt-3">
                     <h3 className="text-lg font-medium text-gray-900 mb-4">
                       {editingFeedback ? 'Edit Feedback' : 'Add New Feedback'}
@@ -269,7 +269,7 @@ export default function FeedbackPage() {
                         </button>
                         <button
                           type="submit"
-                          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+                          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-rose-600 hover:bg-rose-700"
                         >
                           {editingFeedback ? 'Update' : 'Create'}
                         </button>

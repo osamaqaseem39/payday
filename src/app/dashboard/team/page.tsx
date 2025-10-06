@@ -171,7 +171,7 @@ export default function TeamPage() {
         <DashboardLayout>
           <div className="min-h-screen bg-gray-50 flex items-center justify-center">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
               <p className="mt-4 text-gray-600">Loading team members...</p>
             </div>
           </div>
@@ -193,7 +193,7 @@ export default function TeamPage() {
               </div>
               <button
                 onClick={() => setShowForm(true)}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-emerald-600 hover:bg-emerald-700"
               >
                 <HiPlus className="h-4 w-4 mr-2" />
                 Add Team Member
@@ -203,7 +203,7 @@ export default function TeamPage() {
             {/* Form Modal */}
             {showForm && (
               <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-                <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+                <div className="relative top-10 mx-auto p-5 border-t-4 border-emerald-500 w-full max-w-2xl shadow-lg rounded-md bg-white">
                   <div className="mt-3">
                     <h3 className="text-lg font-medium text-gray-900 mb-4">
                       {editingMember ? 'Edit Team Member' : 'Add New Team Member'}
@@ -365,7 +365,7 @@ export default function TeamPage() {
                         </button>
                         <button
                           type="submit"
-                          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+                          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700"
                         >
                           {editingMember ? 'Update' : 'Create'}
                         </button>
@@ -391,8 +391,8 @@ export default function TeamPage() {
                               alt={member.name}
                             />
                           ) : (
-                            <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                              <HiUserGroup className="h-6 w-6 text-blue-600" />
+                            <div className="h-12 w-12 rounded-full bg-emerald-100 flex items-center justify-center">
+                              <HiUserGroup className="h-6 w-6 text-emerald-600" />
                             </div>
                           )}
                         </div>
@@ -451,7 +451,7 @@ export default function TeamPage() {
                         </button>
                         <button
                           onClick={() => handleEdit(member)}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="text-emerald-600 hover:text-emerald-900"
                           title="Edit"
                         >
                           <HiPencil className="h-4 w-4" />

@@ -199,7 +199,7 @@ export default function NewsPage() {
         <DashboardLayout>
           <div className="min-h-screen bg-gray-50 flex items-center justify-center">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mx-auto"></div>
               <p className="mt-4 text-gray-600">Loading news articles...</p>
             </div>
           </div>
@@ -221,7 +221,7 @@ export default function NewsPage() {
               </div>
               <button
                 onClick={() => setShowForm(true)}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-sky-600 hover:bg-sky-700"
               >
                 <HiPlus className="h-4 w-4 mr-2" />
                 Add News Article
@@ -231,7 +231,7 @@ export default function NewsPage() {
             {/* Form Modal */}
             {showForm && (
               <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-                <div className="relative top-10 mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-md bg-white">
+                <div className="relative top-10 mx-auto p-5 border-t-4 border-sky-500 w-full max-w-4xl shadow-lg rounded-md bg-white">
                   <div className="mt-3">
                     <h3 className="text-lg font-medium text-gray-900 mb-4">
                       {editingArticle ? 'Edit News Article' : 'Add New News Article'}
@@ -471,8 +471,8 @@ export default function NewsPage() {
                               alt={article.title}
                             />
                           ) : (
-                            <div className="h-16 w-16 rounded-lg bg-blue-100 flex items-center justify-center">
-                              <HiNewspaper className="h-8 w-8 text-blue-600" />
+                            <div className="h-16 w-16 rounded-lg bg-sky-100 flex items-center justify-center">
+                              <HiNewspaper className="h-8 w-8 text-sky-600" />
                             </div>
                           )}
                         </div>
@@ -552,7 +552,7 @@ export default function NewsPage() {
                         )}
                         <button
                           onClick={() => handleEdit(article)}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="text-sky-600 hover:text-sky-900"
                           title="Edit"
                         >
                           <HiPencil className="h-4 w-4" />

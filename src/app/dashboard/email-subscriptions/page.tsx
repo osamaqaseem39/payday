@@ -162,7 +162,7 @@ export default function EmailSubscriptionsPage() {
         <DashboardLayout>
           <div className="min-h-screen bg-gray-50 flex items-center justify-center">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600 mx-auto"></div>
               <p className="mt-4 text-gray-600">Loading subscriptions...</p>
             </div>
           </div>
@@ -185,14 +185,14 @@ export default function EmailSubscriptionsPage() {
               <div className="flex space-x-3">
                 <button
                   onClick={exportSubscriptions}
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50"
+                  className="inline-flex items-center px-4 py-2 border border-cyan-200 text-sm font-medium rounded-md shadow-sm text-cyan-700 bg-cyan-50 hover:bg-cyan-100"
                 >
                   <HiDownload className="h-4 w-4 mr-2" />
                   Export CSV
                 </button>
                 <button
                   onClick={() => { fetchSubscriptions(); fetchStatistics(); }}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700"
                 >
                   <HiRefresh className="h-4 w-4 mr-2" />
                   Refresh
@@ -273,7 +273,7 @@ export default function EmailSubscriptionsPage() {
             )}
 
             {/* Filters */}
-            <div className="bg-white p-4 rounded-lg shadow">
+            <div className="bg-cyan-50 p-4 rounded-lg shadow border border-cyan-100">
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1">
                   <input
@@ -302,7 +302,7 @@ export default function EmailSubscriptionsPage() {
             </div>
 
             {/* Subscriptions List */}
-            <div className="bg-white shadow overflow-hidden sm:rounded-md">
+            <div className="bg-white shadow overflow-hidden sm:rounded-md border-t-4 border-cyan-500">
               <ul className="divide-y divide-gray-200">
                 {filteredSubscriptions.map((subscription) => (
                   <li key={subscription._id} className="px-6 py-4">
